@@ -2,9 +2,22 @@
 
 @if (!String.IsNullOrEmpty(Model))
 {
-    var statusMessageClass = Model.StartsWith("Error") ? "danger" : "success";
-    <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        @Model
+    var statusMessageClass = Model.StartsWith("Error")
+        ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800"
+        : "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800";
+
+    var icon = Model.StartsWith("Error") ? "fa-circle-exclamation" : "fa-check-circle";
+
+    <div class="@statusMessageClass border rounded-xl p-4 mb-6 flex items-start shadow-sm animate__animated animate__fadeIn" role="alert">
+        <div class="flex-shrink-0 mr-3 mt-0.5">
+            <i class="fas @icon text-lg"></i>
+        </div>
+        <div class="flex-grow text-sm font-medium">
+            @Model
+        </div>
+        <button type="button" class="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex h-8 w-8 hover:bg-black/5 dark:hover:bg-white/10 transition-colors" onclick="this.parentElement.style.display='none';">
+            <span class="sr-only">Kapat</span>
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 }

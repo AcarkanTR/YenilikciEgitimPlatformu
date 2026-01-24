@@ -1,25 +1,51 @@
 ﻿@page
 @model ShowRecoveryCodesModel
 @{
-    ViewData["Title"] = "Recovery codes";
+    ViewData["Title"] = "Kurtarma Kodları";
     ViewData["ActivePage"] = "TwoFactorAuthentication";
 }
 
-<partial name="_StatusMessage" for="StatusMessage" />
-<h3>@ViewData["Title"]</h3>
-<div class="alert alert-warning" role="alert">
-    <p>
-        <strong>Put these codes in a safe place.</strong>
-    </p>
-    <p>
-        If you lose your device and don't have the recovery codes you will lose access to your account.
-    </p>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
-        {
-            <code class="recovery-code">@Model.RecoveryCodes[row]</code><text>&nbsp;</text><code class="recovery-code">@Model.RecoveryCodes[row + 1]</code><br />
-        }
+<div class="max-w-2xl">
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <div class="mb-6">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-list-ol text-accent-500"></i> @ViewData["Title"]
+        </h3>
+    </div>
+
+    <div class="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 rounded-xl p-6 mb-8">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-yellow-600 text-xl mt-1"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-bold text-yellow-800 dark:text-yellow-200">Bu kodları güvenli bir yerde saklayın.</h3>
+                <p class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                    Eğer cihazınızı kaybederseniz ve kurtarma kodlarınız yoksa, hesabınıza erişimi kalıcı olarak kaybedebilirsiniz.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gray-100 dark:bg-petrol-900 border border-gray-200 dark:border-petrol-700 rounded-xl p-6 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
+            {
+                <div class="flex flex-col gap-4">
+                    <code class="block text-center bg-white dark:bg-petrol-800 p-3 rounded-lg border border-gray-200 dark:border-petrol-600 font-mono text-lg font-bold tracking-wider text-gray-800 dark:text-gray-200 select-all">@Model.RecoveryCodes[row]</code>
+                    @if (row + 1 < Model.RecoveryCodes.Length)
+                    {
+                        <code class="block text-center bg-white dark:bg-petrol-800 p-3 rounded-lg border border-gray-200 dark:border-petrol-600 font-mono text-lg font-bold tracking-wider text-gray-800 dark:text-gray-200 select-all">@Model.RecoveryCodes[row + 1]</code>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button onclick="window.print()" class="text-sm font-bold text-petrol-600 dark:text-petrol-400 hover:text-accent-500 dark:hover:text-accent-400 transition-colors">
+            <i class="fas fa-print mr-1"></i> Kodları Yazdır
+        </button>
     </div>
 </div>

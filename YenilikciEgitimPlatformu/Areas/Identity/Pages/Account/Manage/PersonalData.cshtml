@@ -1,24 +1,36 @@
 ﻿@page
 @model PersonalDataModel
 @{
-    ViewData["Title"] = "Personal Data";
+    ViewData["Title"] = "Kişisel Veriler";
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
+    Layout = "_Layout";
 }
 
-<h3>@ViewData["Title"]</h3>
+<div class="max-w-2xl">
+    <div class="mb-6">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-user-shield text-accent-500"></i> @ViewData["Title"]
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Hesabınıza ait verileri yönetin, indirin veya silin.</p>
+    </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
-        <p>
-            <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+    <div class="bg-white dark:bg-petrol-900/50 border border-gray-100 dark:border-petrol-700 rounded-xl p-6 shadow-sm mb-6">
+        <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-6">
+            Hesabınız, bize sağladığınız kişisel verileri içermektedir. Bu sayfa, verilerinizi indirmenize veya kalıcı olarak silmenize olanak tanır.
+            <strong class="block mt-2 text-red-500">Verilerin silinmesi kalıcı bir işlemdir ve geri alınamaz.</strong>
         </p>
-        <form id="download-data" asp-page="DownloadPersonalData" method="post">
-            <button class="btn btn-primary" type="submit">Download</button>
-        </form>
-        <p>
-            <a id="delete" asp-page="DeletePersonalData" class="btn btn-danger">Delete</a>
-        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4">
+            <form id="download-data" asp-page="DownloadPersonalData" method="post" class="flex-1">
+                <button class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-petrol-600 to-petrol-700 hover:from-petrol-700 hover:to-petrol-800 shadow-lg transition-all hover:-translate-y-0.5" type="submit">
+                    <i class="fas fa-download"></i> Verileri İndir
+                </button>
+            </form>
+
+            <a id="delete" asp-page="DeletePersonalData" class="flex-1 w-full flex justify-center items-center gap-2 py-3 px-4 border border-red-200 dark:border-red-800 text-sm font-bold rounded-xl text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all">
+                <i class="fas fa-trash-alt"></i> Hesabı Sil
+            </a>
+        </div>
     </div>
 </div>
 

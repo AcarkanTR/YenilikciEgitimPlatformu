@@ -1,25 +1,71 @@
 ﻿@{
-    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout !=  null)
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
     {
         Layout = parentLayout.ToString();
     }
     else
     {
-        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+        // Ana şablonun yolunun doğru olduğundan emin oluyoruz.
+        Layout = "/Pages/Shared/_Layout.cshtml";
     }
 }
 
-<h1>Manage your account</h1>
+@* ════════════════════════════════════════════════════════════════════════════
+   MANAGE LAYOUT (MODERN DASHBOARD STYLE - FIXED)
+   ════════════════════════════════════════════════════════════════════════════
+   Mimar Notu:
+   - Bu layout, sol taraftaki menüyü (_ManageNav) ve sağdaki içeriği (@RenderBody) birleştirir.
+   - Index.cshtml burayı kullandığında hem sidebar görünür hem de içerik ortalanır.
+*@
 
-<div>
-    <h2>Change your account settings</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-3">
-            <partial name="_ManageNav" />
+<style>
+    .bg-dot-pattern {
+        background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+        background-size: 24px 24px;
+    }
+
+    .dark .bg-dot-pattern {
+        background-image: none;
+    }
+</style>
+
+<!-- py-10: Üstten boşluk bırakarak navbar'a yapışmasını engeller -->
+<div class="relative min-h-[calc(100vh-10rem)] py-10">
+
+    <!-- Arka Plan Efektleri -->
+    <div class="absolute inset-0 z-0 pointer-events-none">
+        <div class="absolute inset-0 bg-dot-pattern opacity-60 dark:opacity-0"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-accent-500/10 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[90px] animate-blob"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-petrol-500/10 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[90px] animate-blob" style="animation-delay: 2s"></div>
+    </div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Header -->
+        <div class="mb-8 text-center md:text-left animate__animated animate__fadeInDown">
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                Hesap Yönetimi
+            </h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">
+                Profil bilgilerinizi, güvenliğinizi ve tercihlerinizi buradan yönetebilirsiniz.
+            </p>
         </div>
-        <div class="col-md-9">
-            @RenderBody()
+
+        <div class="bg-white/80 dark:bg-petrol-950/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/60 dark:border-petrol-700/50 overflow-hidden animate__animated animate__fadeInUp">
+            <div class="grid grid-cols-1 md:grid-cols-12 min-h-[600px]">
+
+                <!-- Sidebar Nav (Sol Menü) -->
+                <div class="md:col-span-3 lg:col-span-3 border-b md:border-b-0 md:border-r border-gray-200 dark:border-petrol-700/50 bg-gray-50/50 dark:bg-petrol-900/30 p-6">
+                    <partial name="_ManageNav" />
+                </div>
+
+                <!-- Main Content (Sağ İçerik) -->
+                <div class="md:col-span-9 lg:col-span-9 p-6 md:p-10 flex flex-col items-center justify-start">
+                    <div class="w-full flex justify-center">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

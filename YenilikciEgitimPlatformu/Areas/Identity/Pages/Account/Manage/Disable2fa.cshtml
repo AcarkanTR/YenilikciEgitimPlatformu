@@ -1,25 +1,41 @@
 ﻿@page
 @model Disable2faModel
 @{
-    ViewData["Title"] = "Disable two-factor authentication (2FA)";
+    ViewData["Title"] = "2FA Devre Dışı Bırak";
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
-<partial name="_StatusMessage" for="StatusMessage" />
-<h3>@ViewData["Title"]</h3>
+<div class="max-w-2xl">
+    <partial name="_StatusMessage" for="StatusMessage" />
 
-<div class="alert alert-warning" role="alert">
-    <p>
-        <strong>This action only disables 2FA.</strong>
-    </p>
-    <p>
-        Disabling 2FA does not change the keys used in authenticator apps. If you wish to change the key
-        used in an authenticator app you should <a asp-page="./ResetAuthenticator">reset your authenticator keys.</a>
-    </p>
-</div>
+    <div class="mb-6">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-shield-alt text-orange-500"></i> @ViewData["Title"]
+        </h3>
+    </div>
 
-<div>
+    <div class="bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800 rounded-xl p-6 mb-8 animate__animated animate__fadeIn">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-circle text-orange-500 text-xl mt-1"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-bold text-orange-800 dark:text-orange-200">Uyarı: Güvenlik Seviyesi Düşecek</h3>
+                <div class="mt-2 text-sm text-orange-700 dark:text-orange-300 space-y-2">
+                    <p>Bu işlem sadece 2FA'yı (İki Faktörlü Doğrulama) devre dışı bırakır.</p>
+                    <p>
+                        Doğrulayıcı uygulamalardaki anahtarları değiştirmez. Eğer anahtarlarınızı değiştirmek istiyorsanız
+                        <a asp-page="./ResetAuthenticator" class="font-bold underline hover:text-orange-900 dark:hover:text-orange-100">doğrulayıcı anahtarlarını sıfırla</a> sayfasını kullanmalısınız.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <form method="post">
-        <button class="btn btn-danger" type="submit">Disable 2FA</button>
+        <button type="submit" class="w-full sm:w-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-sm font-bold rounded-xl text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-lg hover:shadow-red-500/30 transition-all hover:-translate-y-0.5">
+            <i class="fas fa-unlock"></i>
+            2FA'yı Devre Dışı Bırak
+        </button>
     </form>
 </div>

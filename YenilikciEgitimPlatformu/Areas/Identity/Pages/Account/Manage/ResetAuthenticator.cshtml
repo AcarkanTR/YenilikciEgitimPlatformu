@@ -1,24 +1,39 @@
 ﻿@page
 @model ResetAuthenticatorModel
 @{
-    ViewData["Title"] = "Reset authenticator key";
+    ViewData["Title"] = "Authenticator Anahtarını Sıfırla";
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+    Layout = "_Layout";
 }
 
-<partial name="_StatusMessage" for="StatusMessage" />
-<h3>@ViewData["Title"]</h3>
-<div class="alert alert-warning" role="alert">
-    <p>
-        <span class="glyphicon glyphicon-warning-sign"></span>
-        <strong>If you reset your authenticator key your authenticator app will not work until you reconfigure it.</strong>
-    </p>
-    <p>
-        This process disables 2FA until you verify your authenticator app.
-        If you do not complete your authenticator app configuration you may lose access to your account.
-    </p>
-</div>
-<div>
+<div class="max-w-2xl">
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    <div class="mb-6">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-redo text-accent-500"></i> @ViewData["Title"]
+        </h3>
+    </div>
+
+    <div class="bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800 rounded-xl p-6 mb-8 animate__animated animate__pulse">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-circle text-orange-600 text-xl mt-1"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-bold text-orange-800 dark:text-orange-200">Dikkat: Bu işlem doğrulama uygulamanızı bozar!</h3>
+                <div class="mt-2 text-sm text-orange-700 dark:text-orange-300 space-y-2">
+                    <p>Authenticator anahtarınızı sıfırlarsanız, telefonunuzdaki uygulama yeniden yapılandırılana kadar çalışmayacaktır.</p>
+                    <p>Bu işlem, siz tekrar doğrulayana kadar 2FA'yı devre dışı bırakır.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <form id="reset-authenticator-form" method="post">
-        <button id="reset-authenticator-button" class="btn btn-danger" type="submit">Reset authenticator key</button>
+        <button id="reset-authenticator-button" class="w-full sm:w-auto flex justify-center items-center gap-2 py-3 px-6 border border-transparent text-sm font-bold rounded-xl text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-lg hover:shadow-red-500/30 transition-all hover:-translate-y-0.5" type="submit">
+            <i class="fas fa-key"></i>
+            Anahtarı Sıfırla
+        </button>
     </form>
 </div>

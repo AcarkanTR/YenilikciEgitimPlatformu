@@ -1,23 +1,64 @@
 ﻿@page
 @model RegisterConfirmationModel
 @{
-    ViewData["Title"] = "Register confirmation";
+    ViewData["Title"] = "Kayıt Onayı";
 }
 
-<h1>@ViewData["Title"]</h1>
-@{
-    if (@Model.DisplayConfirmAccountLink)
-    {
-<p>
-    This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-    Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
-</p>
+<style>
+    .bg-dot-pattern {
+        background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+        background-size: 24px 24px;
     }
-    else
-    {
-<p>
-        Please check your email to confirm your account.
-</p>
-    }
-}
 
+    .dark .bg-dot-pattern {
+        background-image: none;
+    }
+</style>
+
+<div class="relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden py-12 px-4 sm:px-6 lg:px-8 bg-gray-50/50 dark:bg-transparent">
+
+    <div class="absolute inset-0 z-0 pointer-events-none">
+        <div class="absolute inset-0 bg-dot-pattern opacity-60 dark:opacity-0"></div>
+        <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-accent-500/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[90px] animate-blob"></div>
+    </div>
+
+    <div class="relative w-full max-w-lg z-10 animate__animated animate__zoomIn group">
+        <div class="bg-white/80 dark:bg-petrol-950/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/60 dark:border-petrol-700/50 p-8 sm:p-12 text-center relative overflow-hidden">
+
+            <div class="mx-auto h-24 w-24 bg-gradient-to-tr from-accent-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg mb-8 group-hover:scale-110 transition-transform duration-500">
+                <i class="fas fa-envelope-open-text text-4xl text-white"></i>
+            </div>
+
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6">
+                Kayıt Onayı
+            </h1>
+
+            @if (@Model.DisplayConfirmAccountLink)
+            {
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-6 text-left mb-6">
+                    <p class="text-sm text-yellow-800 dark:text-yellow-200 mb-4 font-medium">
+                        <i class="fas fa-info-circle mr-2"></i> <strong>Geliştirici Notu:</strong>
+                        Şu anda gerçek bir e-posta göndericisi yapılandırılmamış. Normalde bu işlem bir e-posta ile yapılacaktı.
+                    </p>
+                    <div class="text-center">
+                        <a id="confirm-link" href="@Model.EmailConfirmationUrl" class="inline-flex justify-center items-center py-3 px-6 border border-transparent text-sm font-bold rounded-xl text-white bg-yellow-600 hover:bg-yellow-700 shadow-lg hover:shadow-yellow-500/30 transition-all hover:-translate-y-1 w-full sm:w-auto">
+                            <i class="fas fa-check-circle mr-2"></i> Hesabı Doğrula (Simülasyon)
+                        </a>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    Gerçek e-posta göndericisini yapılandırmak için <a href="https://aka.ms/aspaccountconf" class="text-accent-500 hover:underline">bu dökümanı</a> inceleyebilirsiniz.
+                </p>
+            }
+            else
+            {
+                <p class="text-gray-600 dark:text-gray-300 mb-8 text-lg font-medium leading-relaxed">
+                    Hesabınızı onaylamak için lütfen e-posta kutunuzu kontrol edin. Gönderilen bağlantıya tıklayarak kayıt işlemini tamamlayabilirsiniz.
+                </p>
+                <div class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-spinner fa-spin"></i> Onay bekleniyor...
+                </div>
+            }
+        </div>
+    </div>
+</div>

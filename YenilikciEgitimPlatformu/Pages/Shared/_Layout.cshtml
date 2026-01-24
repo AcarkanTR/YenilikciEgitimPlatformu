@@ -1,53 +1,440 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@*
+════════════════════════════════════════════════════════════════════════════
+_Layout.cshtml - V3.6 (LoginPartial Entegrasyonu)
+════════════════════════════════════════════════════════════════════════════
+Değişiklik: Navbar'daki statik Auth butonları kaldırılarak dinamik _LoginPartial çağrısı eklendi.
+*@
+
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - YenilikciEgitimPlatformu</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Yenilikçi Eğitim Platformu</title>
+
+    <!-- Tailwind CSS (Runtime Config) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        petrol: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#002B36',
+                            950: '#001E26'
+                        },
+                        accent: {
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <!-- Site CSS (External) -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/YenilikciEgitimPlatformu.styles.css" asp-append-version="true" />
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">YenilikciEgitimPlatformu</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
+<body class="bg-gray-50 dark:bg-petrol-900 text-slate-800 dark:text-gray-100 font-sans flex flex-col min-h-screen selection:bg-accent-500 selection:text-white transition-colors duration-300">
+
+    @* ================================================================
+       NAVBAR
+       ================================================================ *@
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 top-0 start-0 bg-white/90 dark:bg-petrol-950/90 backdrop-blur-md border-b border-gray-100 dark:border-petrol-800 h-24 lg:h-20 flex items-center shadow-sm">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between">
+
+                @* 1. Logo *@
+                <a asp-page="/Index" class="group relative flex items-center gap-3 z-50 mr-4 lg:mr-8 flex-shrink-0">
+
+                    <!-- Icon -->
+                    <div class="relative w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-gradient-to-br from-petrol-600 to-petrol-500 flex items-center justify-center shadow-md transition-all  duration-300 group-hover:scale-105">
+                        <i class="fas fa-graduation-cap text-white text-sm lg:text-base "></i>
+                    </div>
+
+                    <!-- Text -->
+                    <div class="leading-tight">
+                        <span class=" text-center block text-lg lg:text-xl xl:text-2xl font-semibold tracking-tight text-petrol-800 dark:text-white transition-colors group-hover:text-accent-500">
+                            YEP<span class="text-accent-500"> !</span>
+                        </span>
+                        <span class="block text-[10px] lg:text-xs text-petrol-600 dark:text-gray-400 transition-colors">
+                            Yenilikçi Eğitim Platformu
+                        </span>
+                    </div>
+                </a>
+
+                @* 2. Orta Menü (Desktop - İkon Üstte) *@
+                <div class="hidden lg:flex items-center justify-center space-x-1 flex-1">
+                    <a asp-page="/Index" class="nav-item-vertical @(ViewContext.RouteData.Values["page"]?.ToString() == "/Index" ? "active" : "")">
+                        <i class="fas fa-home nav-icon"></i>
+                        <span class="nav-text">Anasayfa</span>
+                    </a>
+                    <a asp-page="/Projeler/Index" class="nav-item-vertical">
+                        <i class="fas fa-rocket nav-icon"></i>
+                        <span class="nav-text">Projeler</span>
+                    </a>
+                    <a asp-page="/Etkinlikler/Index" class="nav-item-vertical">
+                        <i class="far fa-calendar-alt nav-icon"></i>
+                        <span class="nav-text">Etkinlikler</span>
+                    </a>
+                    <a asp-page="/Yarismalar/Index" class="nav-item-vertical">
+                        <i class="fas fa-trophy nav-icon"></i>
+                        <span class="nav-text">Yarışmalar</span>
+                    </a>
+                    <a asp-page="/Duyurular/Index" class="nav-item-vertical">
+                        <i class="fas fa-bullhorn nav-icon"></i>
+                        <span class="nav-text">Duyurular</span>
+                    </a>
+                    <a asp-page="/Haberler/Index" class="nav-item-vertical">
+                        <i class="far fa-newspaper nav-icon"></i>
+                        <span class="nav-text">Haberler</span>
+                    </a>
+                    <a asp-page="/Iletisim" class="nav-item-vertical">
+                        <i class="far fa-envelope nav-icon"></i>
+                        <span class="nav-text">İletişim</span>
+                    </a>
+                </div>
+
+                @* 3. Sağ Bölüm *@
+                <div class="flex items-center gap-3 ml-auto flex-shrink-0">
+
+                    @* Search *@
+                    <div class="relative hidden md:block">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" class="w-10 focus:w-64 bg-transparent focus:bg-gray-100 dark:focus:bg-petrol-800 border border-transparent focus:border-petrol-300 text-gray-900 dark:text-white text-sm rounded-full pl-10 pr-4 py-2 transition-all duration-500 cursor-pointer focus:cursor-text placeholder-transparent focus:placeholder-gray-500 focus:shadow-md peer" placeholder="Ara...">
+                    </div>
+
+                    @* Theme Toggle *@
+                    <button id="theme-toggle" type="button" class="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-petrol-800 transition-colors flex items-center justify-center relative overflow-hidden group">
+                        <i id="theme-toggle-light-icon" class="fas fa-sun text-accent-500 text-xl hidden animate-spin-slow"></i>
+                        <i id="theme-toggle-dark-icon" class="fas fa-moon text-petrol-600 dark:text-white text-xl hidden group-hover:scale-110 transition-transform"></i>
+                    </button>
+
+                    @* Auth Buttons (Partial View Entegrasyonu) *@
+                    <div class="flex items-center gap-2 pl-2 border-l border-gray-200 dark:border-petrol-700">
+                        <partial name="_LoginPartial" />
+                    </div>
+
+                    @* Mobile Menu Button *@
+                    <button data-collapse-toggle="navbar-mobile" type="button" class="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg dark:text-gray-400 dark:hover:bg-petrol-800" id="mobile-menu-trigger">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+        </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - YenilikciEgitimPlatformu - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        @* Mobile Menu (MODERN - COMPACT GRID) *@
+        <div id="navbar-mobile"
+             class="lg:hidden hidden absolute top-full left-0 w-full bg-white dark:bg-petrol-900
+            border-t border-gray-100 dark:border-petrol-800 shadow-2xl z-50">
+
+            <div class="p-5 max-h-[85vh] overflow-y-auto">
+
+                <!-- 🔍 Floating Label Search (Mobile) -->
+                <div class="relative mb-5">
+                    <input type="text" id="mobileSearch"
+                           class="peer w-full bg-gray-100 dark:bg-petrol-800
+                          text-sm text-gray-800 dark:text-gray-200
+                          rounded-xl px-4 pt-5 pb-2 outline-none
+                          focus:ring-2 focus:ring-accent-500"
+                           placeholder=" " />
+                    <label for="mobileSearch"
+                           class="absolute left-4 top-3 text-xs text-gray-400
+                          transition-all duration-200
+                          peer-placeholder-shown:top-4
+                          peer-placeholder-shown:text-sm
+                          peer-focus:top-2
+                          peer-focus:text-xs
+                          peer-focus:text-accent-500">
+                        Site içinde ara
+                    </label>
+                </div>
+
+                <!-- 📌 Menü Linkleri - 2'li Grid Yapı -->
+                <nav class="grid grid-cols-2 gap-3 mb-4">
+                    <a asp-page="/Index" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-petrol-800/50 hover:bg-white dark:hover:bg-petrol-800 border border-transparent hover:border-gray-200 dark:hover:border-petrol-700 transition-all shadow-sm text-petrol-600 dark:text-gray-300 hover:text-accent-500">
+                        <i class="fas fa-home text-lg mb-1"></i>
+                        <span class="text-xs font-bold">Anasayfa</span>
+                    </a>
+
+                    <a asp-page="/Projeler/Index" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-petrol-800/50 hover:bg-white dark:hover:bg-petrol-800 border border-transparent hover:border-gray-200 dark:hover:border-petrol-700 transition-all shadow-sm text-petrol-600 dark:text-gray-300 hover:text-accent-500">
+                        <i class="fas fa-rocket text-lg mb-1"></i>
+                        <span class="text-xs font-bold">Projeler</span>
+                    </a>
+
+                    <a asp-page="/Etkinlikler/Index" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-petrol-800/50 hover:bg-white dark:hover:bg-petrol-800 border border-transparent hover:border-gray-200 dark:hover:border-petrol-700 transition-all shadow-sm text-petrol-600 dark:text-gray-300 hover:text-accent-500">
+                        <i class="far fa-calendar-alt text-lg mb-1"></i>
+                        <span class="text-xs font-bold">Etkinlikler</span>
+                    </a>
+
+                    <a asp-page="/Yarismalar/Index" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-petrol-800/50 hover:bg-white dark:hover:bg-petrol-800 border border-transparent hover:border-gray-200 dark:hover:border-petrol-700 transition-all shadow-sm text-petrol-600 dark:text-gray-300 hover:text-accent-500">
+                        <i class="fas fa-trophy text-lg mb-1"></i>
+                        <span class="text-xs font-bold">Yarışmalar</span>
+                    </a>
+
+                    <a asp-page="/Duyurular/Index" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-petrol-800/50 hover:bg-white dark:hover:bg-petrol-800 border border-transparent hover:border-gray-200 dark:hover:border-petrol-700 transition-all shadow-sm text-petrol-600 dark:text-gray-300 hover:text-accent-500">
+                        <i class="fas fa-bullhorn text-lg mb-1"></i>
+                        <span class="text-xs font-bold">Duyurular</span>
+                    </a>
+
+                    <a asp-page="/Haberler/Index" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-petrol-800/50 hover:bg-white dark:hover:bg-petrol-800 border border-transparent hover:border-gray-200 dark:hover:border-petrol-700 transition-all shadow-sm text-petrol-600 dark:text-gray-300 hover:text-accent-500">
+                        <i class="far fa-newspaper text-lg mb-1"></i>
+                        <span class="text-xs font-bold">Haberler</span>
+                    </a>
+
+                    <a asp-page="/Iletisim" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50 dark:bg-petrol-800/50 hover:bg-white dark:hover:bg-petrol-800 border border-transparent hover:border-gray-200 dark:hover:border-petrol-700 transition-all shadow-sm text-petrol-600 dark:text-gray-300 hover:text-accent-500 col-span-2">
+                        <i class="far fa-envelope text-lg mb-1"></i>
+                        <span class="text-xs font-bold">İletişim</span>
+                    </a>
+                </nav>
+
+                @* Mobil Auth: LoginPartial burada düzgün çalışmayabilir (tasarım farklılığı), 
+                   bu yüzden mobil için manuel ama aynı link yapısını koruyoruz. 
+                   İleride burası da bir partial olabilir. *@
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="my-4 border-t border-gray-200 dark:border-petrol-800 pt-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-petrol-600 text-white flex items-center justify-center font-bold">
+                                @User.Identity.Name?.Substring(0, 1).ToUpper()
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">@User.Identity.Name</p>
+                                <p class="text-xs text-gray-500">Hesabım</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="flex items-center justify-center gap-2 py-2 rounded-lg bg-gray-100 dark:bg-petrol-800 text-sm font-bold text-gray-700 dark:text-gray-300">
+                                <i class="fas fa-cog"></i> Ayarlar
+                            </a>
+                            <form class="w-full" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
+                                <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-sm font-bold text-red-600 dark:text-red-400">
+                                    <i class="fas fa-power-off"></i> Çıkış
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="my-4 border-t border-gray-200 dark:border-petrol-800 pt-4">
+                        <div class="flex gap-3">
+                            <a asp-page="/Account/Login"
+                               class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl
+                                          bg-gray-100 dark:bg-petrol-800 text-petrol-700 dark:text-gray-300
+                                          hover:bg-gray-200 dark:hover:bg-petrol-700 transition-colors">
+                                <i class="fas fa-sign-in-alt text-sm"></i>
+                                <span class="text-xs font-bold">Giriş Yap</span>
+                            </a>
+
+                            <a asp-page="/Account/Register"
+                               class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl
+                                          bg-accent-500 text-white shadow-md hover:bg-accent-600 transition-colors">
+                                <i class="fas fa-user-plus text-sm"></i>
+                                <span class="text-xs font-bold">Kayıt Ol</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </nav>
+
+    @* ================================================================
+       MAIN CONTENT
+       ================================================================ *@
+    <main class="flex-grow pt-24 lg:pt-20">
+        <div id="alert-container"></div>
+        @RenderBody()
+    </main>
+
+    @* ================================================================
+       FOOTER (Gradient Line Border)
+       ================================================================ *@
+    <footer class="bg-gray-100 dark:bg-petrol-950 text-gray-600 dark:text-gray-400 mt-auto relative transition-colors duration-300">
+
+        <!-- Gradient Line (Footer Top) -->
+        <div class="h-[2px] w-full bg-gradient-to-r from-transparent via-petrol-500 to-transparent opacity-80"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+
+                @* Marka *@
+                <div class="space-y-6 text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start space-x-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-petrol-600 to-petrol-400 rounded-xl flex items-center justify-center shadow-md">
+                            <i class="fas fa-graduation-cap text-white text-xl"></i>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-xl font-bold text-petrol-800 dark:text-white block">Yenilikçi Eğitim</span>
+                            <span class="text-[16px] uppercase tracking-widest text-accent-500 font-bold"> Platformu</span>
+                        </div>
+                    </div>
+                    <p class="text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                        Geleceği şekillendiren projeler ve fırsatlar dünyası. Sınırları kaldırın, birlikte üretin.
+                    </p>
+
+                    @* Sosyal Medya *@
+                    <div class="flex justify-center md:justify-start space-x-3">
+                        <a href="#" class="social-icon-btn text-[#1877f2] hover:bg-[#1877f2] hover:border-[#1877f2]"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon-btn text-[#1da1f2] hover:bg-[#1da1f2] hover:border-[#1da1f2]"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon-btn text-[#e4405f] hover:bg-[#e4405f] hover:border-[#e4405f]"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon-btn text-[#0077b5] hover:bg-[#0077b5] hover:border-[#0077b5]"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                @* Kurumsal *@
+                <div class="text-center md:text-left">
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-6 inline-flex items-center">
+                        <span class="w-1 h-6 bg-accent-500 rounded-full mr-3 hidden md:block"></span>
+                        Kurumsal
+                    </h3>
+                    <ul class="space-y-4 inline-block md:block text-left">
+                        <li><a href="#" class="footer-link"><i class="fas fa-building w-6 text-center"></i>Hakkımızda</a></li>
+                        <li><a href="#" class="footer-link"><i class="fas fa-bullseye w-6 text-center"></i>Misyon & Vizyon</a></li>
+                        <li><a href="#" class="footer-link"><i class="fas fa-users w-6 text-center"></i>Ekibimiz</a></li>
+                    </ul>
+                </div>
+
+                @* Yardım Merkezi *@
+                <div class="text-center md:text-left">
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-6 inline-flex items-center">
+                        <span class="w-1 h-6 bg-accent-500 rounded-full mr-3 hidden md:block"></span>
+                        Yardım Merkezi
+                    </h3>
+                    <ul class="space-y-4 inline-block md:block text-left">
+                        <li><a href="#" class="footer-link"><i class="fas fa-question-circle w-6 text-center"></i>S.S.S.</a></li>
+                        <li><a href="#" class="footer-link"><i class="fas fa-envelope w-6 text-center"></i>İletişim Formu</a></li>
+                        <li><a href="#" class="footer-link"><i class="fas fa-headset w-6 text-center"></i>Canlı Destek</a></li>
+                    </ul>
+                </div>
+
+                @* Bize Katılın *@
+                <div class="text-center md:text-left">
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-6 inline-flex items-center">
+                        <span class="w-1 h-6 bg-accent-500 rounded-full mr-3 hidden md:block"></span>
+                        Bize Katılın
+                    </h3>
+                    <div class="bg-white dark:bg-petrol-900 p-5 rounded-2xl shadow-md border border-gray-100 dark:border-petrol-700 hover:shadow-lg transition-shadow">
+                        <p class="text-xs mb-4 italic text-gray-500 dark:text-gray-400 leading-relaxed text-center">
+                            "Eğitim, dünyayı değiştirmek için kullanabileceğiniz en güçlü silahtır."
+                        </p>
+                        <a asp-page="/Account/Register" class="block w-full text-center py-3 px-4 bg-gradient-to-r from-petrol-600 to-petrol-500 text-white rounded-xl text-xs font-bold hover:shadow-lg hover:from-accent-500 hover:to-accent-600 transition-all transform hover:-translate-y-0.5">
+                            <i class="fas fa-user-plus mr-2"></i> Topluluğa Katıl
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative mt-12 pt-8 text-center text-xs flex flex-col md:flex-row justify-between items-center text-gray-500 dark:text-gray-400">
+                <!-- Gradient Separator for Copyright -->
+                <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-petrol-700 to-transparent"></div>
+
+                <p>&copy; @DateTime.Now.Year Yenilikçi Eğitim Platformu. Tüm hakları saklıdır.</p>
+                <div class="space-x-6 mt-4 md:mt-0 font-medium">
+                    <a href="#" class="hover:text-accent-500 transition-colors">Kullanım Şartları</a>
+                    <a href="#" class="hover:text-accent-500 transition-colors">Gizlilik Politikası</a>
+                    <a href="#" class="hover:text-accent-500 transition-colors">KVKK</a>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Not: Inline CSS bloğu kaldırıldı, site.css dosyasına taşındı. -->
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var themeToggleBtn = document.getElementById('theme-toggle');
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (localStorage.getItem('theme')) {
+                if (localStorage.getItem('theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            }
+        });
+
+        const mobileMenuTrigger = document.getElementById('mobile-menu-trigger');
+        const mobileMenu = document.getElementById('navbar-mobile');
+        mobileMenuTrigger.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        @if (TempData["SweetAlert"] != null)
+        {
+                        @Html.Raw(TempData["SweetAlert"])
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

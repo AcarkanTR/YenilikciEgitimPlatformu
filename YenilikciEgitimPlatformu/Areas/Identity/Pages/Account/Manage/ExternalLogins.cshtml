@@ -1,53 +1,106 @@
 ﻿@page
 @model ExternalLoginsModel
 @{
-    ViewData["Title"] = "Manage your external logins";
+    ViewData["Title"] = "Bağlı Hesapların Yönetimi";
     ViewData["ActivePage"] = ManageNavPages.ExternalLogins;
 }
 
-<partial name="_StatusMessage" for="StatusMessage" />
-@if (Model.CurrentLogins?.Count > 0)
-{
-    <h3>Registered Logins</h3>
-    <table class="table">
-        <tbody>
-            @foreach (var login in Model.CurrentLogins)
-            {
-                <tr>
-                    <td id="@($"login-provider-{login.LoginProvider}")">@login.ProviderDisplayName</td>
-                    <td>
-                        @if (Model.ShowRemoveButton)
+<div class="max-w-3xl">
+    <div class="mb-6">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-share-alt text-accent-500"></i> @ViewData["Title"]
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Google, Facebook gibi harici hesaplarınızı buradan yönetebilirsiniz.</p>
+    </div>
+
+    <partial name="_StatusMessage" for="StatusMessage" />
+
+    @if (Model.CurrentLogins?.Count > 0)
+    {
+        <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Bağlı Hesaplarınız</h4>
+        <div class="bg-white dark:bg-petrol-900/50 border border-gray-100 dark:border-petrol-700 rounded-xl overflow-hidden shadow-sm mb-8">
+            <table class="w-full text-sm text-left">
+                <tbody class="divide-y divide-gray-100 dark:divide-petrol-700">
+                    @foreach (var login in Model.CurrentLogins)
+                    {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-petrol-800/50 transition-colors">
+                            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white flex items-center gap-3">
+                                @if (login.ProviderDisplayName == "Google")
+                                {
+                                    <i class="fab fa-google text-red-500 text-lg"></i>
+                                }
+                                else if (login.ProviderDisplayName == "Facebook")
+                                {
+
+                                    <i class="fab fa-facebook text-blue-600 text-lg"></i>
+                                }
+                                else if (login.ProviderDisplayName == "Microsoft")
+                                {
+
+                                    <i class="fab fa-microsoft text-blue-400 text-lg"></i>
+                                }
+                                else
+                                {
+
+                                    <i class="fas fa-globe text-gray-400 text-lg"></i>
+                                }
+                                @login.ProviderDisplayName
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                @if (Model.ShowRemoveButton)
+                                {
+                                    <form id="@($"remove-login-{login.LoginProvider}")" asp-page-handler="RemoveLogin" method="post">
+                                        <input asp-for="@login.LoginProvider" name="LoginProvider" type="hidden" />
+                                        <input asp-for="@login.ProviderKey" name="ProviderKey" type="hidden" />
+                                        <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-bold text-xs bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg transition-colors border border-red-100 dark:border-red-800" title="Bu hesabı kaldır">
+                                            <i class="fas fa-trash-alt mr-1"></i> Bağlantıyı Kes
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-xs text-gray-400 italic">Tek giriş yöntemi</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @if (Model.OtherLogins?.Count > 0)
+    {
+        <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Yeni Hesap Ekle</h4>
+        <div class="bg-gray-50 dark:bg-petrol-900/30 border border-gray-200 dark:border-petrol-700 rounded-xl p-6">
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Giriş yapmak için başka bir servis ekleyin:</p>
+            <form id="link-login-form" asp-page-handler="LinkLogin" method="post" class="flex flex-wrap gap-3">
+                @foreach (var provider in Model.OtherLogins)
+                {
+                    <button id="@($"link-login-button-{provider.Name}")" type="submit" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-petrol-800 text-gray-700 dark:text-gray-200 rounded-lg shadow-sm border border-gray-200 dark:border-petrol-600 hover:bg-gray-50 dark:hover:bg-petrol-700 transition-all font-bold text-sm" name="provider" value="@provider.Name" title="@provider.DisplayName hesabınızı kullanarak giriş yapın">
+                        @if (provider.DisplayName == "Google")
                         {
-                            <form id="@($"remove-login-{login.LoginProvider}")" asp-page-handler="RemoveLogin" method="post">
-                                <div>
-                                    <input asp-for="@login.LoginProvider" name="LoginProvider" type="hidden" />
-                                    <input asp-for="@login.ProviderKey" name="ProviderKey" type="hidden" />
-                                    <button type="submit" class="btn btn-primary" title="Remove this @login.ProviderDisplayName login from your account">Remove</button>
-                                </div>
-                            </form>
+                            <i class="fab fa-google text-red-500"></i>
+                        }
+                        else if (provider.DisplayName == "Facebook")
+                        {
+
+                            <i class="fab fa-facebook text-blue-600"></i>
+                        }
+                        else if (provider.DisplayName == "Microsoft")
+                        {
+
+                            <i class="fab fa-microsoft text-blue-400"></i>
                         }
                         else
                         {
-                            @: &nbsp;
+
+                            <i class="fas fa-globe"></i>
                         }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-@if (Model.OtherLogins?.Count > 0)
-{
-    <h4>Add another service to log in.</h4>
-    <hr />
-    <form id="link-login-form" asp-page-handler="LinkLogin" method="post" class="form-horizontal">
-        <div id="socialLoginList">
-            <p>
-                @foreach (var provider in Model.OtherLogins)
-                {
-                    <button id="@($"link-login-button-{provider.Name}")" type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                        @provider.DisplayName ile Bağlan
+                    </button>
                 }
-            </p>
+            </form>
         </div>
-    </form>
-}
+    }
+</div>

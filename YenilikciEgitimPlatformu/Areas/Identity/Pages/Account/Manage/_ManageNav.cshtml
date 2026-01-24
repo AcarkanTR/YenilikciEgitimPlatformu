@@ -1,15 +1,80 @@
 ﻿@inject SignInManager<ApplicationUser> SignInManager
+@using YenilikciEgitimPlatformu.Areas.Identity.Pages.Account.Manage
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a></li>
+
+<nav class="space-y-2">
+    <a id="profile" asp-page="./Index" class="@ManageNavPages.IndexNavClass(ViewContext) group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out">
+        <i class="fas fa-id-card w-6 text-lg mr-3 transition-transform group-hover:scale-110"></i>
+        <span>Profil Bilgileri</span>
+        <i class="fas fa-chevron-right ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-xs"></i>
+    </a>
+
+    <a id="email" asp-page="./Email" class="@ManageNavPages.EmailNavClass(ViewContext) group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out">
+        <i class="fas fa-envelope w-6 text-lg mr-3 transition-transform group-hover:scale-110"></i>
+        <span>E-posta Adresi</span>
+        <i class="fas fa-chevron-right ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-xs"></i>
+    </a>
+
+    <a id="change-password" asp-page="./ChangePassword" class="@ManageNavPages.ChangePasswordNavClass(ViewContext) group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out">
+        <i class="fas fa-key w-6 text-lg mr-3 transition-transform group-hover:scale-110"></i>
+        <span>Şifre Değiştir</span>
+        <i class="fas fa-chevron-right ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-xs"></i>
+    </a>
+
     @if (hasExternalLogins)
     {
-        <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li>
+        <a id="external-login" asp-page="./ExternalLogins" class="@ManageNavPages.ExternalLoginsNavClass(ViewContext) group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out">
+            <i class="fas fa-share-alt w-6 text-lg mr-3 transition-transform group-hover:scale-110"></i>
+            <span>Bağlı Hesaplar</span>
+            <i class="fas fa-chevron-right ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-xs"></i>
+        </a>
     }
-    <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
-</ul>
+
+    <a id="two-factor" asp-page="./TwoFactorAuthentication" class="@ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext) group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out">
+        <i class="fas fa-shield-alt w-6 text-lg mr-3 transition-transform group-hover:scale-110"></i>
+        <span>İki Faktörlü Doğrulama</span>
+        <i class="fas fa-chevron-right ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-xs"></i>
+    </a>
+
+    <a id="personal-data" asp-page="./PersonalData" class="@ManageNavPages.PersonalDataNavClass(ViewContext) group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out">
+        <i class="fas fa-user-shield w-6 text-lg mr-3 transition-transform group-hover:scale-110"></i>
+        <span>Kişisel Veriler</span>
+        <i class="fas fa-chevron-right ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-xs"></i>
+    </a>
+</nav>
+
+<style>
+    /* Active Link Styling */
+    .nav-link.active {
+        background-color: rgba(249, 115, 22, 0.1); /* accent-50 */
+        color: #f97316; /* accent-500 */
+        border: 1px solid rgba(249, 115, 22, 0.2);
+    }
+
+    .dark .nav-link.active {
+        background-color: rgba(249, 115, 22, 0.2);
+        color: #fb923c; /* accent-400 */
+        border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+
+    /* Inactive Link Styling */
+    .nav-link:not(.active) {
+        color: #4b5563; /* gray-600 */
+    }
+
+        .nav-link:not(.active):hover {
+            background-color: rgba(243, 244, 246, 0.8); /* gray-100 */
+            color: #111827; /* gray-900 */
+        }
+
+    .dark .nav-link:not(.active) {
+        color: #9ca3af; /* gray-400 */
+    }
+
+        .dark .nav-link:not(.active):hover {
+            background-color: rgba(31, 41, 55, 0.5); /* gray-800 */
+            color: #f3f4f6; /* gray-100 */
+        }
+</style>

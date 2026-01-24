@@ -851,7 +851,7 @@ module.exports = {
 ### Geliştirme Ortamı
 
 **Gerekli Araçlar:**
-- Visual Studio 2022 (.NET 10 SDK)
+- Visual Studio 2026 (.NET 10 SDK)
 - SQL Server 2022
 - Node.js (Tailwind CLI için)
 - Git

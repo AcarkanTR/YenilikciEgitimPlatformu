@@ -2,79 +2,206 @@
 @model LoginModel
 
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = "Giriş Yap";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+@* ════════════════════════════════════════════════════════════════════════════
+   LOGIN PAGE (MODERN GLASSMORPHISM V4 - ENHANCED LIGHT MODE & ANIMATIONS)
+   ════════════════════════════════════════════════════════════════════════════
+   Mimar Notu: 
+   - İkonlara 'group-hover:animate-bounce' efekti eklendi.
+   - Light Mode arka planına dot pattern ve mesh gradient uygulandı.
+   - Floating label yapısı stabil.
+*@
+
+<style>
+    /* Autofill Hack */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0) inset !important;
+        -webkit-text-fill-color: inherit !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* Light Mode Dot Pattern */
+    .bg-dot-pattern {
+        background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+        background-size: 24px 24px;
+    }
+
+    .dark .bg-dot-pattern {
+        background-image: none;
+    }
+</style>
+
+<div class="relative min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden py-12 px-4 sm:px-6 lg:px-8 bg-gray-50/50 dark:bg-transparent">
+
+    <!-- Arka Plan Efektleri -->
+    <div class="absolute inset-0 z-0 pointer-events-none">
+
+        <!-- Light Mode: Dot Pattern ve Hafif Mesh Gradient -->
+        <div class="absolute inset-0 bg-dot-pattern opacity-60 dark:opacity-0 transition-opacity duration-500"></div>
+        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-50/40 via-white/10 to-cyan-50/40 dark:from-transparent dark:to-transparent opacity-80"></div>
+
+        <!-- Blob Efektleri -->
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-accent-500/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[90px] animate-blob"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-petrol-500/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[90px] animate-blob" style="animation-delay: 2s"></div>
+
+        <!-- Noise Texture -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+    </div>
+
+    <!-- Login Card Container -->
+    <div class="relative w-full max-w-md z-10 animate__animated animate__fadeInUp group">
+
+        <!-- Glass Card -->
+        <div class="bg-white/80 dark:bg-petrol-950/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/60 dark:border-petrol-700/50 p-8 sm:p-10 relative overflow-hidden transition-all duration-500 hover:shadow-petrol-500/10 hover:border-petrol-500/30">
+
+            <!-- Header -->
+            <div class="text-center mb-10">
+                <!-- İkon: Hover'da Zıplama Efekti (animate-bounce) -->
+                <div class="mx-auto h-20 w-20 bg-gradient-to-br from-petrol-600 to-petrol-400 rounded-2xl flex items-center justify-center shadow-lg transform mb-6 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:animate-bounce">
+                    <i class="fas fa-user-circle text-4xl text-white"></i>
                 </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                <h2 class="mt-4 text-3xl font-extrabold tracking-tight">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-petrol-800 to-gray-900 dark:from-white dark:via-gray-200 dark:to-white">
+                        Hoş Geldiniz
+                    </span>
+                </h2>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
+                    Yenilikçi eğitim dünyasına giriş yapın.
+                </p>
+            </div>
+
+            <form id="account" method="post" class="space-y-6">
+                <div asp-validation-summary="ModelOnly" class="text-accent-600 text-sm font-bold text-center bg-accent-50 dark:bg-accent-900/10 p-3 rounded-xl border border-accent-100 dark:border-accent-900/20 animate__animated animate__shakeX" role="alert"></div>
+
+                <!-- Email Input -->
+                <div class="relative">
+                    <input asp-for="Input.Email"
+                           id="floating_email"
+                           class="block px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50/50 dark:bg-petrol-900/50 rounded-xl border border-gray-300 dark:border-petrol-600 appearance-none dark:text-white focus:outline-none focus:ring-0 focus:border-petrol-500 focus:bg-white dark:focus:bg-petrol-900 peer pl-11 transition-all duration-200"
+                           placeholder=" "
+                           autocomplete="username" />
+
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                        <i class="fas fa-envelope text-gray-400 peer-focus:text-petrol-500 transition-colors duration-200"></i>
+                    </div>
+
+                    <label for="floating_email"
+                           class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-11 peer-focus:text-petrol-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-3.5 peer-focus:scale-75 peer-focus:-translate-y-4 font-medium pointer-events-none">
+                        E-posta Adresi
                     </label>
+                    <span asp-validation-for="Input.Email" class="text-red-500 text-xs mt-1 block font-bold ml-1"></span>
                 </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+
+                <!-- Password Input -->
+                <div class="relative">
+                    <input asp-for="Input.Password"
+                           id="floating_password"
+                           class="block px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50/50 dark:bg-petrol-900/50 rounded-xl border border-gray-300 dark:border-petrol-600 appearance-none dark:text-white focus:outline-none focus:ring-0 focus:border-petrol-500 focus:bg-white dark:focus:bg-petrol-900 peer pl-11 transition-all duration-200"
+                           placeholder=" "
+                           autocomplete="current-password" />
+
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                        <i class="fas fa-lock text-gray-400 peer-focus:text-petrol-500 transition-colors duration-200"></i>
+                    </div>
+
+                    <label for="floating_password"
+                           class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-11 peer-focus:text-petrol-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:top-3.5 peer-focus:scale-75 peer-focus:-translate-y-4 font-medium pointer-events-none">
+                        Şifre
+                    </label>
+                    <span asp-validation-for="Input.Password" class="text-red-500 text-xs mt-1 block font-bold ml-1"></span>
                 </div>
+
+                <!-- Remember & Forgot Password -->
+                <div class="flex items-center justify-between text-sm pt-1">
+                    <div class="flex items-center pl-1">
+                        <input asp-for="Input.RememberMe" class="w-5 h-5 text-petrol-600 bg-gray-100 border-gray-300 rounded focus:ring-petrol-500 dark:focus:ring-petrol-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-pointer transition-all" />
+                        <label asp-for="Input.RememberMe" class="ml-2 block text-gray-700 dark:text-gray-300 cursor-pointer select-none font-medium">
+                            Beni Hatırla
+                        </label>
+                    </div>
+                    <div>
+                        <a id="forgot-password" asp-page="./ForgotPassword" class="font-bold text-petrol-600 hover:text-accent-500 dark:text-petrol-400 dark:hover:text-accent-400 transition-colors">
+                            Şifremi Unuttum?
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
                 <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
+                    <button id="login-submit" type="submit" class="group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-petrol-600 to-petrol-500 hover:from-accent-500 hover:to-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 shadow-lg shadow-petrol-500/30 hover:shadow-xl hover:shadow-accent-500/40 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-4">
+                            <i class="fas fa-sign-in-alt text-lg group-hover:translate-x-1 transition-transform duration-300"></i>
+                        </span>
+                        Giriş Yap
+                        <div class="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-500 ease-in-out -skew-x-12 -translate-x-full"></div>
+                    </button>
                 </div>
             </form>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
+
+            <!-- Divider -->
+            <div class="relative my-8">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200 dark:border-petrol-700"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-4 bg-white dark:bg-petrol-950/80 text-gray-500 dark:text-gray-400 rounded-full font-medium shadow-sm">veya</span>
+                </div>
+            </div>
+
+            <!-- Register Link -->
+            <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Henüz hesabınız yok mu?
+                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="font-bold text-accent-500 hover:text-accent-600 transition-colors inline-flex items-center gap-1 group/reg hover:underline">
+                        Hemen Kayıt Ol
+                        <i class="fas fa-arrow-right text-xs group-hover/reg:translate-x-1 transition-transform"></i>
+                    </a>
+                </p>
+            </div>
+
+            <!-- External Login -->
+            @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+            {
+                <div class="mt-6">
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="grid grid-cols-1 gap-3">
+                        @foreach (var provider in Model.ExternalLogins!)
+                        {
+                            <button type="submit" class="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-200 dark:border-petrol-600 rounded-xl shadow-sm bg-gray-50 dark:bg-petrol-800/50 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-petrol-700 transition-all hover:-translate-y-0.5" name="provider" value="@provider.Name">
+                                @if (provider.DisplayName == "Google")
                                 {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                    <i class="fab fa-google text-red-500 mr-2 text-lg"></i>
                                 }
-                            </p>
-                        </div>
+                                else if (provider.DisplayName == "Microsoft")
+                                {
+
+                                    <i class="fab fa-microsoft text-blue-500 mr-2 text-lg"></i>
+                                }
+                                else
+                                {
+
+                                    <i class="fas fa-globe mr-2 text-lg"></i>
+                                }
+                                <span>@provider.DisplayName ile Giriş Yap</span>
+                            </button>
+                        }
                     </form>
-                }
+                </div>
             }
-        </section>
+
+        </div>
+
+        <!-- Alt Footer -->
+        <div class="text-center">
+            <a href="/" class="text-xs font-medium text-petrol-400 hover:text-accent-500 transition-colors inline-flex items-center gap-1 group/back">
+                <i class="fas fa-arrow-left group-hover/back:-translate-x-1 transition-transform"></i> Ana Sayfaya Dön
+            </a>
+        </div>
+
     </div>
 </div>
 
