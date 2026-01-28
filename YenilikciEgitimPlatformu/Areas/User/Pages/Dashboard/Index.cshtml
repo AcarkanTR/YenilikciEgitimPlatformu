@@ -1,0 +1,247 @@
+﻿@page
+@model YenilikciEgitimPlatformu.Areas.User.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["Subtitle"] = $"Hoş geldin, {Model.Data.KullaniciAdi}!";
+    Layout = "~/Pages/Shared/_LayoutDashboard.cshtml";
+}
+
+<!-- Hoş Geldin Kartı -->
+<div class="card-modern p-6 mb-8 bg-gradient-to-br from-petrol-500 to-petrol-600 text-white">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-3xl font-bold mb-2">Hoş geldin, @Model.Data.KullaniciAdi! 👋</h2>
+            <p class="text-white/80">İşte senin için hazırladığımız özet</p>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.Data.ProfilFotoUrl))
+        {
+            <img src="@Model.Data.ProfilFotoUrl" alt="@Model.Data.KullaniciAdi" class="w-24 h-24 rounded-full border-4 border-white/20 object-cover" />
+        }
+        else
+        {
+            <div class="w-24 h-24 rounded-full border-4 border-white/20 bg-white/20 flex items-center justify-center">
+                <i class="fas fa-user text-4xl text-white/60"></i>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- İstatistik Kartları -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <!-- Projeler -->
+    <div class="card-modern p-4 text-center hover:shadow-soft-hover transition-shadow">
+        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-petrol-400 to-petrol-600 rounded-full flex items-center justify-center">
+            <i class="fas fa-rocket text-white text-xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-petrol-900 dark:text-white">@Model.Data.ToplamProjeSayisi</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Toplam Proje</p>
+        <p class="text-xs text-green-600 dark:text-green-400 mt-1">@Model.Data.AktifProjeSayisi aktif</p>
+    </div>
+
+    <!-- Gönderiler -->
+    <div class="card-modern p-4 text-center hover:shadow-soft-hover transition-shadow">
+        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+            <i class="fas fa-comment text-white text-xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-petrol-900 dark:text-white">@Model.Data.ToplamGonderiSayisi</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Gönderi</p>
+    </div>
+
+    <!-- Rozetler -->
+    <div class="card-modern p-4 text-center hover:shadow-soft-hover transition-shadow">
+        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
+            <i class="fas fa-trophy text-white text-xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-petrol-900 dark:text-white">@Model.Data.KazanilanRozetSayisi</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Rozet</p>
+    </div>
+
+    <!-- Seviye Puanı -->
+    <div class="card-modern p-4 text-center hover:shadow-soft-hover transition-shadow">
+        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+            <i class="fas fa-star text-white text-xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-petrol-900 dark:text-white">@Model.Data.SeviPuani</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">XP Puanı</p>
+    </div>
+</div>
+
+<!-- Grafikler ve Projeler -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Aylık Aktivite -->
+    <div class="card-modern p-6">
+        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-chart-bar mr-2 text-petrol-600"></i>
+            Aylık Aktiviten
+        </h3>
+        <canvas id="monthlyActivityChart"></canvas>
+    </div>
+
+    <!-- Proje Durum Dağılımı -->
+    <div class="card-modern p-6">
+        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-chart-pie mr-2 text-purple-600"></i>
+            Proje Durumları
+        </h3>
+        <canvas id="projectStatusChart"></canvas>
+    </div>
+</div>
+
+<!-- Son Projeler ve Aktiviteler -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Son Projeler -->
+    <div class="card-modern p-6">
+        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center justify-between">
+            <span>
+                <i class="fas fa-rocket mr-2 text-petrol-600"></i>
+                Son Projelerim
+            </span>
+            <a asp-area="User" asp-page="/Projeler/Index" class="text-sm text-petrol-600 dark:text-petrol-400 hover:underline">
+                Tümünü Gör →
+            </a>
+        </h3>
+
+        @if (Model.Data.SonProjeler.Any())
+        {
+            <div class="space-y-3">
+                @foreach (var proje in Model.Data.SonProjeler)
+                {
+                    <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-petrol-800/50 transition-colors">
+                        @if (!string.IsNullOrEmpty(proje.KapakResmiUrl))
+                        {
+                            <img src="@proje.KapakResmiUrl" alt="@proje.Baslik" class="w-16 h-16 rounded-lg object-cover" />
+                        }
+                        else
+                        {
+                            <div class="w-16 h-16 bg-gradient-to-br from-petrol-400 to-petrol-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-rocket text-white text-xl"></i>
+                            </div>
+                        }
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 dark:text-white truncate">@proje.Baslik</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">@proje.Durum</p>
+                            <div class="mt-1">
+                                <div class="w-full bg-gray-200 dark:bg-petrol-700 rounded-full h-2">
+                                    <div class="bg-gradient-to-r from-petrol-500 to-petrol-600 h-2 rounded-full" style="width: @proje.IlerlemeYuzdesi%"></div>
+                                </div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">%@proje.IlerlemeYuzdesi</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-8">
+                <i class="fas fa-rocket text-6xl text-gray-300 dark:text-gray-700 mb-4"></i>
+                <p class="text-gray-500 dark:text-gray-400">Henüz proje oluşturmadın</p>
+                <a asp-area="User" asp-page="/Projeler/Olustur" class="inline-block mt-4 px-4 py-2 bg-gradient-to-r from-petrol-500 to-petrol-600 text-white rounded-lg hover:from-petrol-600 hover:to-petrol-700 transition-colors">
+                    İlk Projeyi Oluştur
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- Son Aktiviteler -->
+    <div class="card-modern p-6">
+        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-history mr-2 text-amber-600"></i>
+            Son Aktiviteler
+        </h3>
+
+        @if (Model.Data.SonAktiviteler.Any())
+        {
+            <div class="space-y-3">
+                @foreach (var aktivite in Model.Data.SonAktiviteler)
+                {
+                    <div class="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-petrol-800/50 transition-colors">
+                        <div class="w-10 h-10 bg-gradient-to-br from-petrol-100 to-petrol-200 dark:from-petrol-700 dark:to-petrol-800 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="@aktivite.Ikon text-petrol-600 dark:text-petrol-400"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">@aktivite.Tip</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 truncate">@aktivite.Aciklama</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                @aktivite.Tarih.ToString("dd MMM yyyy, HH:mm")
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-8">
+                <i class="fas fa-history text-6xl text-gray-300 dark:text-gray-700 mb-4"></i>
+                <p class="text-gray-500 dark:text-gray-400">Henüz aktivite yok</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Aylık Aktivite Bar Chart
+        const monthlyActivityCtx = document.getElementById('monthlyActivityChart').getContext('2d');
+        new Chart(monthlyActivityCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.Data.AylikAktivite.Select(a => a.Ay))),
+                datasets: [{
+                    label: 'Aktivite Sayısı',
+                    data: @Html.Raw(Json.Serialize(Model.Data.AylikAktivite.Select(a => a.Deger))),
+                    backgroundColor: 'rgba(20, 184, 166, 0.8)',
+                    borderColor: 'rgb(20, 184, 166)',
+                    borderWidth: 1,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+
+        // Proje Durum Dağılımı
+        const projectStatusCtx = document.getElementById('projectStatusChart').getContext('2d');
+        new Chart(projectStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Durum))),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Sayi))),
+                    backgroundColor: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Renk))),
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 10
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

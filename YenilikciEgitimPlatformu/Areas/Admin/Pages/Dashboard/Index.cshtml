@@ -1,0 +1,233 @@
+﻿@page
+@model YenilikciEgitimPlatformu.Areas.Admin.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Subtitle"] = "Sistem genel görünümü ve istatistikler";
+    Layout = "~/Pages/Shared/_LayoutDashboard.cshtml";
+}
+
+<!-- İstatistik Kartları -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Toplam Kullanıcı -->
+    <div class="stat-card group">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-white/80 text-sm font-medium">Toplam Kullanıcı</p>
+                <h3 class="text-3xl font-bold text-white mt-2">@Model.Data.ToplamKullaniciSayisi</h3>
+                <p class="text-white/60 text-xs mt-1">
+                    <span class="text-green-300">+@Model.Data.BuAyYeniKullanici</span> bu ay
+                </p>
+            </div>
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-users text-3xl text-white"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toplam Çağrı -->
+    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 group">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-white/80 text-sm font-medium">Toplam Çağrı</p>
+                <h3 class="text-3xl font-bold text-white mt-2">@Model.Data.ToplamCagriSayisi</h3>
+                <p class="text-white/60 text-xs mt-1">
+                    <span class="text-green-300">@Model.Data.AktifCagriSayisi</span> aktif
+                </p>
+            </div>
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-bullhorn text-3xl text-white"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toplam Proje -->
+    <div class="stat-card bg-gradient-to-br from-amber-500 to-amber-600 group">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-white/80 text-sm font-medium">Toplam Proje</p>
+                <h3 class="text-3xl font-bold text-white mt-2">@Model.Data.ToplamProjeSayisi</h3>
+                <p class="text-white/60 text-xs mt-1">
+                    <span class="text-green-300">+@Model.Data.BuAyYeniProje</span> bu ay
+                </p>
+            </div>
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-rocket text-3xl text-white"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bekleyen Onaylar -->
+    <div class="stat-card bg-gradient-to-br from-red-500 to-red-600 group">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-white/80 text-sm font-medium">Bekleyen Onay</p>
+                <h3 class="text-3xl font-bold text-white mt-2">@Model.Data.BekleyenOnaylar.ToplamBekleyen</h3>
+                <p class="text-white/60 text-xs mt-1">Hemen incele</p>
+            </div>
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i class="fas fa-clock text-3xl text-white"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafikler Row -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Aylık Kullanıcı Kayıtları (Line Chart) -->
+    <div class="card-modern p-6">
+        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-chart-line mr-2 text-petrol-600"></i>
+            Aylık Kullanıcı Kayıtları
+        </h3>
+        <canvas id="monthlyUsersChart"></canvas>
+    </div>
+
+    <!-- Proje Durum Dağılımı (Pie Chart) -->
+    <div class="card-modern p-6">
+        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-chart-pie mr-2 text-purple-600"></i>
+            Proje Durum Dağılımı
+        </h3>
+        <canvas id="projectStatusChart"></canvas>
+    </div>
+</div>
+
+<!-- En Aktif Kullanıcılar -->
+<div class="card-modern p-6">
+    <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
+        <i class="fas fa-trophy mr-2 text-amber-500"></i>
+        En Aktif Kullanıcılar
+    </h3>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-200 dark:border-petrol-700">
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Sıra</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Kullanıcı</th>
+                    <th class="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Projeler</th>
+                    <th class="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Gönderiler</th>
+                    <th class="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Aktivite Puanı</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var (kullanici, index) in Model.Data.EnAktifKullanicilar.Select((k, i) => (k, i)))
+                {
+                    <tr class="border-b border-gray-100 dark:border-petrol-800 hover:bg-gray-50 dark:hover:bg-petrol-700/30 transition-colors">
+                        <td class="py-3 px-4">
+                            @if (index < 3)
+                            {
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white font-bold text-sm">
+                                    @(index + 1)
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-gray-500 dark:text-gray-400 font-semibold">@(index + 1)</span>
+                            }
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center space-x-3">
+                                @if (!string.IsNullOrEmpty(kullanici.ProfilFotoUrl))
+                                {
+                                    <img src="@kullanici.ProfilFotoUrl" alt="@kullanici.AdSoyad" class="w-10 h-10 rounded-full object-cover" />
+                                }
+                                else
+                                {
+                                    <div class="w-10 h-10 bg-gradient-to-br from-petrol-400 to-petrol-600 rounded-full flex items-center justify-center text-white font-bold">
+                                        @kullanici.AdSoyad.Substring(0, 2).ToUpper()
+                                    </div>
+                                }
+                                <span class="font-medium text-gray-900 dark:text-white">@kullanici.AdSoyad</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-petrol-100 dark:bg-petrol-700 text-petrol-800 dark:text-petrol-200">
+                                @kullanici.ProjeSayisi
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200">
+                                @kullanici.GonderiSayisi
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="text-lg font-bold text-amber-600 dark:text-amber-400">@kullanici.AktivitePuani</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Aylık Kullanıcı Kayıtları Line Chart
+        const monthlyUsersCtx = document.getElementById('monthlyUsersChart').getContext('2d');
+        new Chart(monthlyUsersCtx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.Data.AylikKayitlar.Select(a => a.Ay))),
+                datasets: [{
+                    label: 'Yeni Kullanıcılar',
+                    data: @Html.Raw(Json.Serialize(Model.Data.AylikKayitlar.Select(a => a.Deger))),
+                    borderColor: 'rgb(20, 184, 166)',
+                    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: 'rgb(20, 184, 166)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+
+        // Proje Durum Dağılımı Pie Chart
+        const projectStatusCtx = document.getElementById('projectStatusChart').getContext('2d');
+        new Chart(projectStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Durum))),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Sayi))),
+                    backgroundColor: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Renk))),
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 15,
+                            padding: 15
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

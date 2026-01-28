@@ -1,0 +1,405 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using YenilikciEgitimPlatformu.Models.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var isAdmin = User.IsInRole("Admin");
+    var pageTitle = ViewData["Title"]?.ToString() ?? "Panel";
+
+    // Kullanıcı Adı/Soyadı Güvenli Alma (Null Check)
+    var ad = user?.Ad ?? "";
+    var soyad = user?.Soyad ?? "";
+    var tamAd = $"{ad} {soyad}".Trim();
+    if (string.IsNullOrEmpty(tamAd)) tamAd = user?.UserName ?? "Kullanıcı";
+
+    var basHarfler = "";
+    if (ad.Length > 0) basHarfler += ad[0];
+    if (soyad.Length > 0) basHarfler += soyad[0];
+    if (string.IsNullOrEmpty(basHarfler) && !string.IsNullOrEmpty(user?.UserName))
+        basHarfler = user.UserName.Substring(0, 1).ToUpper();
+
+    // Aktif sayfa belirleme
+    var currentPath = Context.Request.Path.ToString().ToLower();
+}
+
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@pageTitle - Yenilikçi Eğitim Platformu</title>
+
+    <!-- Tailwind CSS (Runtime Config - MASTER PROMPT UYUMLU) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Eski petrol renklerini uyumluluk için koruyoruz ama tonları güncelliyoruz
+                        petrol: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#002B36',
+                            950: '#001E26'
+                        },
+                        accent: {
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <script>
+        // Dark mode flash önleme (Prompt Requirement)
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <style>
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .dark .glass-panel {
+            background: rgba(22, 33, 62, 0.7); /* Primary-800 based */
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-sidebar {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .dark .glass-sidebar {
+            background: rgba(15, 23, 42, 0.95); /* Darker */
+        }
+
+        /* Sidebar Link Active State */
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .nav-link::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 4px;
+                background: #f97316; /* Accent-500 */
+                transform: scaleY(0);
+                transition: transform 0.3s ease;
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+            }
+
+            .nav-link:hover::before, .nav-link.active::before {
+                transform: scaleY(1);
+            }
+
+            .nav-link.active {
+                background: rgba(249, 115, 22, 0.1); /* Accent with opacity */
+                color: #f97316;
+            }
+
+        .dark .nav-link.active {
+            background: rgba(249, 115, 22, 0.15);
+            color: #fb923c; /* Accent-400 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-primary-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300">
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-panel" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar (Glassmorphism + Fixed) -->
+    <aside id="sidebar" class="fixed top-0 left-0 z-50 h-screen w-72 transition-transform -translate-x-full lg:translate-x-0 border-r border-gray-200 dark:border-primary-800 glass-sidebar flex flex-col shadow-2xl">
+
+        <!-- Logo Area -->
+        <div class="h-20 flex items-center px-6 border-b border-gray-100 dark:border-primary-800 bg-gradient-to-r from-primary-800 to-primary-700 text-white">
+            <a asp-page="/Index" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-graduation-cap text-accent-500 text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">YEP Panel</h1>
+                    <p class="text-[10px] text-gray-300 uppercase tracking-wider">Yönetim Paneli</p>
+                </div>
+            </a>
+            <!-- Mobile Close Button -->
+            <button class="lg:hidden ml-auto text-white/70 hover:text-white" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- User Profile Summary (Sidebar Top) -->
+        <div class="p-6 pb-2">
+            <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-primary-800/50 border border-gray-100 dark:border-primary-700">
+                <div class="relative">
+                    @if (!string.IsNullOrEmpty(user?.ProfilFotografiUrl))
+                    {
+                        <img src="@user.ProfilFotografiUrl" alt="@tamAd" class="w-12 h-12 rounded-full object-cover border-2 border-accent-500 shadow-md" />
+                    }
+                    else
+                    {
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 text-white flex items-center justify-center font-bold text-lg border-2 border-white dark:border-primary-700 shadow-md">
+                            @basHarfler
+                        </div>
+                    }
+                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-primary-800 rounded-full"></div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white truncate">@tamAd</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">@(isAdmin ? "Yönetici" : "Kullanıcı")</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-4 px-4 space-y-1 custom-scrollbar">
+
+            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-2">Menü</p>
+
+            @if (isAdmin)
+            {
+                <a asp-area="Admin" asp-page="/Dashboard/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/admin/dashboard") ? "active" : "")">
+                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
+                        <i class="fas fa-chart-pie"></i>
+                    </span>
+                    Genel Bakış
+                </a>
+
+                <a asp-area="Admin" asp-page="/Kullanicilar/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/admin/kullanicilar") ? "active" : "")">
+                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
+                        <i class="fas fa-users-cog"></i>
+                    </span>
+                    Kullanıcılar
+                </a>
+
+                <a asp-area="Admin" asp-page="/Icerik/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/admin/icerik") ? "active" : "")">
+                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
+                        <i class="fas fa-layer-group"></i>
+                    </span>
+                    İçerik Yönetimi
+                </a>
+            }
+            else
+            {
+                <a asp-area="User" asp-page="/Dashboard/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/user/dashboard") ? "active" : "")">
+                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
+                        <i class="fas fa-home"></i>
+                    </span>
+                    Panelim
+                </a>
+
+                <a asp-area="User" asp-page="/Projeler/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/user/projeler") ? "active" : "")">
+                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
+                        <i class="fas fa-rocket"></i>
+                    </span>
+                    Projelerim
+                </a>
+
+                <a asp-area="User" asp-page="/Basvurularim/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/user/basvurularim") ? "active" : "")">
+                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
+                        <i class="fas fa-clipboard-check"></i>
+                    </span>
+                    Başvurularım
+                </a>
+            }
+
+            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">Hesap</p>
+
+            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/account/manage") ? "active" : "")">
+                <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
+                    <i class="fas fa-user-cog"></i>
+                </span>
+                Profil Ayarları
+            </a>
+
+            <a href="/" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group">
+                <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
+                    <i class="fas fa-globe"></i>
+                </span>
+                Siteye Dön
+            </a>
+
+            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post" class="mt-auto px-4 py-4">
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-red-600 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Güvenli Çıkış
+                </button>
+            </form>
+        </nav>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="lg:ml-72 flex flex-col min-h-screen transition-all duration-300">
+
+        <!-- Sticky Top Navbar (Glassmorphism) -->
+        <header class="sticky top-0 z-30 h-20 glass-panel border-b border-gray-200 dark:border-primary-800">
+            <div class="h-full px-6 flex items-center justify-between">
+
+                <!-- Left: Mobile Toggle & Title -->
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-primary-800 transition-colors">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+
+                    <div>
+                        <h2 class="text-xl font-bold text-primary-700 dark:text-white leading-tight">@pageTitle</h2>
+                        @if (ViewData["Subtitle"] != null)
+                        {
+                            <p class="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">@ViewData["Subtitle"]</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex items-center gap-3 sm:gap-4">
+
+                    <!-- Search (Hidden Mobile) -->
+                    <div class="hidden md:block relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Hızlı ara..." class="pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-primary-800 border-none text-sm focus:ring-2 focus:ring-accent-500 w-48 transition-all hover:w-64" />
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-primary-800 transition-colors relative overflow-hidden">
+                        <i class="fas fa-sun text-xl absolute transition-transform duration-300 dark:scale-0 dark:rotate-90"></i>
+                        <i class="fas fa-moon text-xl absolute transition-transform duration-300 scale-0 rotate-90 dark:scale-100 dark:rotate-0"></i>
+                    </button>
+
+                    <!-- Notifications -->
+                    <button class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-primary-800 transition-colors relative group">
+                        <i class="fas fa-bell text-xl group-hover:text-accent-500 transition-colors"></i>
+                        <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-accent-500 rounded-full border-2 border-white dark:border-primary-900"></span>
+                    </button>
+
+                    <!-- User Avatar (Mobile visible) -->
+                    <div class="block lg:hidden">
+                        @if (!string.IsNullOrEmpty(user?.ProfilFotografiUrl))
+                        {
+                            <img src="@user.ProfilFotografiUrl" class="w-9 h-9 rounded-full object-cover" />
+                        }
+                        else
+                        {
+                            <div class="w-9 h-9 rounded-full bg-primary-600 text-white flex items-center justify-center text-sm font-bold">
+                                @basHarfler
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 lg:p-8 animate-fade-in relative">
+            <!-- Alert Container -->
+            <div id="alert-container"></div>
+
+            @RenderBody()
+        </main>
+
+        <!-- Footer -->
+        <footer class="p-6 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-primary-800 mt-auto">
+            <p>&copy; @DateTime.Now.Year Yenilikçi Eğitim Platformu. <span class="hidden sm:inline">Tüm hakları saklıdır.</span></p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // --- Sidebar Logic ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // --- Dark Mode Logic (Prompt Uyumlu) ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        themeToggleBtn.addEventListener('click', function() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // --- SweetAlert2 Entegrasyonu (AlertService) ---
+        @if (TempData["SweetAlert"] != null)
+        {
+                @Html.Raw(TempData["SweetAlert"])
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

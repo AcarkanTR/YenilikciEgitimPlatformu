@@ -30,6 +30,32 @@
 
                 <!-- Menü Linkleri -->
                 <div class="px-1 space-y-1">
+
+                    @* 🔐 Panel Bölümü *@
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-area="Admin" asp-page="/Dashboard/Index"
+                           class="group flex items-center px-3 py-2.5 text-sm font-semibold text-petrol-800 dark:text-gray-200 rounded-xl hover:bg-accent-50 dark:hover:bg-petrol-800 hover:text-accent-600 transition-colors">
+                            <div class="w-8 h-8 rounded-lg bg-accent-100 dark:bg-petrol-800 flex items-center justify-center mr-3 group-hover:bg-accent-500 group-hover:text-white transition-colors">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            Yönetici Paneli
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-area="User" asp-page="/Dashboard/Index"
+                           class="group flex items-center px-3 py-2.5 text-sm font-semibold text-petrol-800 dark:text-gray-200 rounded-xl hover:bg-accent-50 dark:hover:bg-petrol-800 hover:text-accent-600 transition-colors">
+                            <div class="w-8 h-8 rounded-lg bg-accent-100 dark:bg-petrol-800 flex items-center justify-center mr-3 group-hover:bg-accent-500 group-hover:text-white transition-colors">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            Kullanıcı Paneli
+                        </a>
+                    }
+
+                    @* Ayırıcı Çizgi *@
+                    <div class="my-2 border-t border-gray-200 dark:border-petrol-700"></div>
+
                     <a asp-area="Identity" asp-page="/Account/Manage/Index" class="group flex items-center px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-petrol-800 hover:text-accent-500 transition-colors">
                         <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-petrol-800 flex items-center justify-center mr-3 group-hover:bg-accent-500 group-hover:text-white transition-colors">
                             <i class="fas fa-user-cog"></i>

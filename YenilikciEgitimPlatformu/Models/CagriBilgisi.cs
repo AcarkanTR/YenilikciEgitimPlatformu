@@ -160,6 +160,26 @@ public class CagriBilgisi : BaseEntity
     [Display(Name = "Başvuru Bitiş")]
     public DateTime? BasvuruBitisTarihi { get; set; }
 
+    /// <summary>
+    /// Görüntülenme sayısı
+    /// </summary>
+    public int GoruntulenmeSayisi { get; set; } // Veya null olabilirse: int?
+
+    /// <summary>
+    /// Başvuru linki
+    /// </summary>
+    public string BasvuruLinki { get; set; }
+
+    /// <summary>
+    /// Düzenlenen kurum logosu URL
+    /// </summary>
+    public string DuzenlenenKurumLogoUrl { get; set; }
+
+    /// <summary>
+    /// Düzenlenen kurum
+    /// </summary>
+    public string DuzenlenenKurum { get; set; }
+
     #endregion
 
     #region Katılım Şartları

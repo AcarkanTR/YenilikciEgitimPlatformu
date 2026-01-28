@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using YenilikciEgitimPlatformu.Data;
-using YenilikciEgitimPlatformu.Models.Identity;
-//using YenilikciEgitimPlatformu.Services.Interfaces;
-using YenilikciEgitimPlatformu.Services;
-using YenilikciEgitimPlatformu.Hubs;
 using Serilog;
 using System.Globalization;
-using Microsoft.AspNetCore.Localization;
+using YenilikciEgitimPlatformu.Data;
+using YenilikciEgitimPlatformu.Hubs;
+using YenilikciEgitimPlatformu.Models.Identity;
+using YenilikciEgitimPlatformu.Services;
+using YenilikciEgitimPlatformu.Services.Implementations;
+using YenilikciEgitimPlatformu.Services.Interfaces;
 
 #region Program Başlangıç ve Loglama Yapılandırması
 /*
@@ -166,6 +167,43 @@ try
 
     // IEmailSender istendiğinde EmailSender sınıfını kullan demektir.
     builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, EmailSender>();
+
+    // ============================================================================
+    // SERVİS KAYITLARI (DEPENDENCY INJECTION)
+    // ============================================================================
+
+    // Service Layer kayıtları
+    builder.Services.AddScoped<IDashboardService, DashboardService>();
+    builder.Services.AddScoped<ICagriBilgisiService, CagriBilgisiService>();
+    builder.Services.AddScoped<IProjeYonetimService, ProjeYonetimService>();
+
+    // ============================================================================
+    // AUTHORIZATION POLİCY
+    // ============================================================================
+
+    builder.Services.AddAuthorization(options =>
+    {
+        // Admin-only policy
+        options.AddPolicy("AdminOnly", policy =>
+            policy.RequireRole("Admin"));
+
+        // User policy (Admin da dahil)
+        options.AddPolicy("UserAccess", policy =>
+            policy.RequireRole("Admin", "User"));
+    });
+
+    // ============================================================================
+    // RAZOR PAGES AREAS SUPPORT
+    // ============================================================================
+
+    builder.Services.AddRazorPages(options =>
+    {
+        // Admin area - Sadece Admin rolü
+        options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminOnly");
+
+        // User area - Oturum açmış kullanıcılar
+        options.Conventions.AuthorizeAreaFolder("User", "/");
+    });
 
     /*
     // Kullanıcı ve Profil Servisleri

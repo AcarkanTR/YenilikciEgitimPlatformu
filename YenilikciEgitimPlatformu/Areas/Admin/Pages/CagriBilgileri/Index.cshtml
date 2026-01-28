@@ -1,0 +1,211 @@
+﻿@page
+@model YenilikciEgitimPlatformu.Areas.Admin.Pages.CagriBilgileri.IndexModel
+@{
+    ViewData["Title"] = "Çağrı Bilgileri Yönetimi";
+    ViewData["Subtitle"] = "Resmi kurum çağrılarını yönetin";
+    Layout = "~/Pages/Shared/_LayoutDashboard.cshtml";
+}
+
+<!-- Başlık ve Filtreler -->
+<div class="card-modern p-6 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <h3 class="text-xl font-bold text-petrol-900 dark:text-white">
+            <i class="fas fa-bullhorn mr-2"></i>
+            Çağrı Bilgileri
+        </h3>
+        <a asp-page="./Olustur" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-petrol-500 to-petrol-600 text-white rounded-lg hover:from-petrol-600 hover:to-petrol-700 transition-colors">
+            <i class="fas fa-plus mr-2"></i>
+            Yeni Çağrı Ekle
+        </a>
+    </div>
+
+    <!-- Filtre Formu -->
+    <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="floating-label-group">
+            <input type="text" name="Filtre.Arama" value="@Model.Filtre.Arama" placeholder=" " />
+            <label>Arama</label>
+        </div>
+
+        <div class="floating-label-group">
+            <select name="Filtre.Turu" asp-items="Html.GetEnumSelectList<YenilikciEgitimPlatformu.Models.CagriTuru>()">
+                <option value="">Tüm Türler</option>
+            </select>
+            <label>Çağrı Türü</label>
+        </div>
+
+        <div class="floating-label-group">
+            <input type="text" name="Filtre.Kurum" value="@Model.Filtre.Kurum" placeholder=" " />
+            <label>Kurum</label>
+        </div>
+
+        <div class="flex items-end gap-2">
+            <button type="submit" class="flex-1 px-4 py-2 bg-petrol-600 text-white rounded-lg hover:bg-petrol-700 transition-colors">
+                <i class="fas fa-search mr-2"></i>
+                Ara
+            </button>
+            <a asp-page="./Index" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                <i class="fas fa-redo"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Sonuç Bilgisi -->
+<div class="mb-4 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+    <span>Toplam <strong>@Model.TotalCount</strong> çağrı bulundu</span>
+    <span>Sayfa @Model.Filtre.Page / @Math.Ceiling((double)Model.TotalCount / Model.Filtre.PageSize)</span>
+</div>
+
+<!-- Çağrı Listesi -->
+<div class="grid grid-cols-1 gap-4">
+    @if (Model.Data.Any())
+    {
+        @foreach (var cagri in Model.Data)
+        {
+            <div class="card-modern p-4 hover:shadow-soft-hover transition-shadow">
+                <div class="flex items-start gap-4">
+                    <!-- Kapak Resmi -->
+                    @if (!string.IsNullOrEmpty(cagri.KapakResmiUrl))
+                    {
+                        <img src="@cagri.KapakResmiUrl" alt="@cagri.Baslik" class="w-24 h-24 rounded-lg object-cover" />
+                    }
+                    else
+                    {
+                        <div class="w-24 h-24 bg-gradient-to-br from-petrol-400 to-petrol-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-bullhorn text-white text-3xl"></i>
+                        </div>
+                    }
+
+                    <!-- İçerik -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex-1">
+                                <h4 class="text-lg font-bold text-petrol-900 dark:text-white mb-1">@cagri.Baslik</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">@cagri.Kurum</p>
+                                @if (!string.IsNullOrEmpty(cagri.KisaAciklama))
+                                {
+                                    <p class="text-sm text-gray-500 dark:text-gray-500 line-clamp-2">@cagri.KisaAciklama</p>
+                                }
+                            </div>
+
+                            <!-- Durum Badge -->
+                            @if (cagri.Aktif)
+                            {
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+                                    <i class="fas fa-check-circle mr-1"></i> Aktif
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200">
+                                    <i class="fas fa-pause-circle mr-1"></i> Pasif
+                                </span>
+                            }
+                        </div>
+
+                        <!-- Meta Bilgiler -->
+                        <div class="flex flex-wrap items-center gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400">
+                            <span>
+                                <i class="fas fa-tag mr-1"></i> @cagri.TuruText
+                            </span>
+                            <span>
+                                <i class="fas fa-calendar mr-1"></i>
+                                @(cagri.BaslangicTarihi?.ToString("dd MMM yyyy") ?? "-")
+                            </span>
+
+                            @if (cagri.BitisTarihi.HasValue)
+                            {
+                                <span>
+                                    <i class="fas fa-calendar-times mr-1"></i> Bitiş: @cagri.BitisTarihi.Value.ToString("dd MMM yyyy")
+                                </span>
+                            }
+                            <span>
+                                <i class="fas fa-users mr-1"></i> @cagri.TakipciSayisi takipçi
+                            </span>
+                            <span>
+                                <i class="fas fa-eye mr-1"></i> @cagri.GoruntulenmeSayisi görüntülenme
+                            </span>
+                        </div>
+
+                        <!-- İşlem Butonları -->
+                        <div class="flex items-center gap-2 mt-4">
+                            <a asp-page="./Detay" asp-route-slug="@cagri.Slug" target="_blank" class="inline-flex items-center px-3 py-1.5 text-sm bg-petrol-100 dark:bg-petrol-900/30 text-petrol-800 dark:text-petrol-200 rounded-lg hover:bg-petrol-200 dark:hover:bg-petrol-800/50 transition-colors">
+                                <i class="fas fa-eye mr-1"></i> Görüntüle
+                            </a>
+                            <a asp-page="./Duzenle" asp-route-id="@cagri.Id" class="inline-flex items-center px-3 py-1.5 text-sm bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-800/50 transition-colors">
+                                <i class="fas fa-edit mr-1"></i> Düzenle
+                            </a>
+                            <button type="button" onclick="confirmDelete(@cagri.Id, '@cagri.Baslik')" class="inline-flex items-center px-3 py-1.5 text-sm bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded-lg hover:bg-red-200 dark:hover:bg-red-800/50 transition-colors">
+                                <i class="fas fa-trash mr-1"></i> Sil
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="card-modern p-12 text-center">
+            <i class="fas fa-inbox text-6xl text-gray-300 dark:text-gray-700 mb-4"></i>
+            <p class="text-gray-500 dark:text-gray-400">Henüz çağrı bulunmuyor</p>
+            <a asp-page="./Olustur" class="inline-block mt-4 px-4 py-2 bg-gradient-to-r from-petrol-500 to-petrol-600 text-white rounded-lg hover:from-petrol-600 hover:to-petrol-700 transition-colors">
+                İlk Çağrıyı Ekle
+            </a>
+        </div>
+    }
+</div>
+
+<!-- Sayfalama -->
+@if (Model.TotalCount > Model.Filtre.PageSize)
+{
+    <div class="mt-6 flex justify-center">
+        <nav class="inline-flex rounded-lg shadow-sm">
+            @if (Model.Filtre.Page > 1)
+            {
+                <a asp-page="./Index" asp-route-page="@(Model.Filtre.Page - 1)" class="px-4 py-2 text-sm bg-white dark:bg-petrol-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-petrol-700 rounded-l-lg hover:bg-gray-50 dark:hover:bg-petrol-700">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            }
+
+            <span class="px-4 py-2 text-sm bg-petrol-600 text-white border-t border-b border-petrol-600">
+                @Model.Filtre.Page
+            </span>
+
+            @if (Model.Filtre.Page < Math.Ceiling((double)Model.TotalCount / Model.Filtre.PageSize))
+            {
+                <a asp-page="./Index" asp-route-page="@(Model.Filtre.Page + 1)" class="px-4 py-2 text-sm bg-white dark:bg-petrol-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-petrol-700 rounded-r-lg hover:bg-gray-50 dark:hover:bg-petrol-700">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            }
+        </nav>
+    </div>
+}
+
+<!-- Silme Formu (Hidden) -->
+<form id="deleteForm" method="post" asp-page-handler="Delete" style="display:none;">
+    <input type="hidden" name="id" id="deleteId" />
+</form>
+
+@section Scripts {
+    <script>
+        function confirmDelete(id, baslik) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                html: `<strong>${baslik}</strong> isimli çağrı silinecek. Bu işlem geri alınamaz!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e94560',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Evet, Sil',
+                cancelButtonText: 'İptal',
+                focusCancel: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteId').value = id;
+                    document.getElementById('deleteForm').submit();
+                }
+            });
+        }
+    </script>
+}
