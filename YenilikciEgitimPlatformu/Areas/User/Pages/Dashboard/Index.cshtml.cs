@@ -51,12 +51,21 @@ public class IndexModel : PageModel
                 return;
             }
 
+            // Servis üzerinden verileri çek
             Data = await _dashboardService.GetUserDashboardDataAsync(user.Id);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "User dashboard yüklenirken hata oluþtu");
-            // Hata durumunda boþ model döner
+            // Hata durumunda boþ model döner, sayfa patlamaz.
+        }
+
+        // UI tarafýnda Substring(0,1) hatasý almamak için (ArgumentOutOfRangeException)
+        // Eðer veri gelmezse veya hata olursa KullaniciAdi boþ kalabilir.
+        // Bu durumda User.Identity.Name veya varsayýlan bir deðer atýyoruz.
+        if (string.IsNullOrEmpty(Data.KullaniciAdi))
+        {
+            Data.KullaniciAdi = User.Identity?.Name ?? "Kullanýcý";
         }
     }
 
@@ -67,27 +76,18 @@ public class IndexModel : PageModel
  * SAYFA AÇIKLAMASI:
  * ==================
  * Bu sayfa oturum açmýþ kullanýcýlar için kiþisel dashboard'dur.
- * 
- * Ýçerik:
- * - Hoþ geldin kartý (Profil fotoðrafý ile)
- * - Ýstatistik kartlarý (Proje, Gönderi, Rozet, XP)
- * - Aylýk aktivite grafiði (Chart.js Bar Chart)
+ * * Ýçerik:
+ * - Hoþ geldin baþlýðý (Tam geniþlik)
+ * - Ýstatistik kartlarý (Glassmorphism tasarým)
+ * - Aylýk aktivite grafiði (Chart.js Bar Chart - Dark Mode uyumlu)
  * - Proje durum daðýlýmý (Chart.js Doughnut Chart)
- * - Son projeler listesi (Ýlerleme çubuðu ile)
+ * - Son projeler listesi (Ýlerleme halkasý ile)
  * - Son aktiviteler zaman çizelgesi
- * 
- * Yetkilendirme:
+ * * Yetkilendirme:
  * - Tüm oturum açmýþ kullanýcýlar eriþebilir
- * 
- * Layout:
+ * * Layout:
  * - _LayoutDashboard.cshtml kullanýlýr (User sidebar gösterilir)
- * 
- * Servis Kullanýmý:
- * - IDashboardService üzerinden kullanýcýya özel veriler çekilir
- * - UserManager ile mevcut kullanýcý bilgisi alýnýr
- * 
- * Özel Özellikler:
- * - Eðer kullanýcýnýn projesi yoksa "Ýlk Projeyi Oluþtur" CTA gösterilir
- * - Aktivite boþsa "Henüz aktivite yok" mesajý gösterilir
- * - Responsive tasarým (Mobile-first)
+ * * Tasarým:
+ * - Admin paneli ile tutarlý "Glassmorphism" ve "Dot Pattern" arkaplaný kullanýldý.
+ * - Negatif margin kullanýlarak Header tam geniþliðe yayýldý.
  */

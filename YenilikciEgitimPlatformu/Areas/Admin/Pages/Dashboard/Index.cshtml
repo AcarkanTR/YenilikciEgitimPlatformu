@@ -2,228 +2,356 @@
 @model YenilikciEgitimPlatformu.Areas.Admin.Pages.Dashboard.IndexModel
 @{
     ViewData["Title"] = "Admin Dashboard";
-    ViewData["Subtitle"] = "Sistem genel görünümü ve istatistikler";
     Layout = "~/Pages/Shared/_LayoutDashboard.cshtml";
 }
 
-<!-- İstatistik Kartları -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <!-- Toplam Kullanıcı -->
-    <div class="stat-card group">
-        <div class="flex items-center justify-between">
+@* --- Özel Stiller (Glassmorphism & Pattern) --- *@
+<style>
+    .bg-dot-pattern {
+        background-image: radial-gradient(#94a3b8 1px, transparent 1px);
+        background-size: 24px 24px;
+    }
+
+    .dark .bg-dot-pattern {
+        background-image: radial-gradient(#334155 1px, transparent 1px);
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .dark .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+
+    /* Tablo Satır Hover Efekti */
+    .table-row-hover:hover td {
+        background-color: rgba(243, 244, 246, 0.5); /* gray-100/50 */
+    }
+
+    .dark .table-row-hover:hover td {
+        background-color: rgba(51, 65, 85, 0.5); /* slate-700/50 */
+    }
+</style>
+
+<div class="relative min-h-screen">
+
+    <!-- Arka Plan (Sadeleştirildi - Rahatsız edici blob'lar kaldırıldı) -->
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute inset-0 bg-dot-pattern opacity-10 dark:opacity-5"></div>
+        <!-- Sadece sağ altta çok hafif bir ambiyans ışığı bırakıldı -->
+        <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-petrol-500/5 rounded-full filter blur-[120px]"></div>
+    </div>
+
+    <!-- Full Width Header Section (Layout Padding'ini kırmak için negatif margin kullanıldı) -->
+    <div class="relative z-10 -mx-6 lg:-mx-8 px-6 lg:px-8 py-8 mb-8 bg-gradient-to-r from-white via-gray-50/50 to-white dark:from-petrol-900 dark:via-petrol-900/50 dark:to-petrol-900 border-b border-gray-200 dark:border-petrol-800 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 animate__animated animate__fadeInDown">
             <div>
-                <p class="text-white/80 text-sm font-medium">Toplam Kullanıcı</p>
-                <h3 class="text-3xl font-bold text-white mt-2">@Model.Data.ToplamKullaniciSayisi</h3>
-                <p class="text-white/60 text-xs mt-1">
-                    <span class="text-green-300">+@Model.Data.BuAyYeniKullanici</span> bu ay
+                <h1 class="text-3xl font-black text-petrol-900 dark:text-white tracking-tight flex items-center gap-3">
+                    <span class="w-1.5 h-8 rounded-full bg-accent-500 shadow-lg shadow-accent-500/30"></span>
+                    Genel Bakış
+                </h1>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2 ml-5">
+                    Platform performans metrikleri ve anlık durum raporu.
                 </p>
             </div>
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <i class="fas fa-users text-3xl text-white"></i>
+
+            <!-- Modern Sistem Durumu Göstergesi -->
+            <div class="flex items-center gap-4">
+                <div class="hidden md:block text-right mr-2">
+                    <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Sunucu Zamanı</span>
+                    <span class="font-mono text-sm font-bold text-petrol-600 dark:text-petrol-400">@DateTime.Now.ToString("HH:mm")</span>
+                </div>
+
+                <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white dark:bg-petrol-800 border border-gray-100 dark:border-petrol-700 shadow-sm">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500 shadow-lg shadow-green-500/50"></span>
+                    </span>
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-gray-700 dark:text-gray-200 leading-none">Sistem Çevrimiçi</span>
+                        <span class="text-[10px] text-gray-400 mt-0.5 leading-none">Tüm servisler aktif</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Toplam Çağrı -->
-    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 group">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-white/80 text-sm font-medium">Toplam Çağrı</p>
-                <h3 class="text-3xl font-bold text-white mt-2">@Model.Data.ToplamCagriSayisi</h3>
-                <p class="text-white/60 text-xs mt-1">
-                    <span class="text-green-300">@Model.Data.AktifCagriSayisi</span> aktif
-                </p>
+    <!-- İçerik Wrapper -->
+    <div class="relative z-10 space-y-8">
+
+        <!-- İstatistik Kartları -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate__animated animate__fadeInUp">
+
+            <!-- Kullanıcılar -->
+            <div class="glass-card p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Toplam Kullanıcı</p>
+                        <h3 class="text-3xl font-black text-petrol-800 dark:text-white mt-2">@Model.Data.ToplamKullaniciSayisi</h3>
+                        <div class="mt-2 inline-flex items-center text-xs font-medium text-green-600 bg-green-50 dark:bg-green-900/20 px-2.5 py-1 rounded-lg border border-green-100 dark:border-green-900/30">
+                            <i class="fas fa-arrow-up mr-1.5"></i> @Model.Data.BuAyYeniKullanici yeni
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                </div>
             </div>
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <i class="fas fa-bullhorn text-3xl text-white"></i>
+
+            <!-- Okullar -->
+            <div class="glass-card p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Kayıtlı Okullar</p>
+                        <h3 class="text-3xl font-black text-petrol-800 dark:text-white mt-2">@Model.Data.ToplamOkulSayisi</h3>
+                        <div class="mt-2 inline-flex items-center text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <i class="fas fa-school mr-1.5"></i> @Model.Data.AktifOkulSayisi aktif
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-university text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projeler -->
+            <div class="glass-card p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Toplam Proje</p>
+                        <h3 class="text-3xl font-black text-petrol-800 dark:text-white mt-2">@Model.Data.ToplamProjeSayisi</h3>
+                        <div class="mt-2 inline-flex items-center text-xs font-medium text-accent-600 bg-accent-50 dark:bg-accent-900/20 px-2.5 py-1 rounded-lg border border-accent-100 dark:border-accent-900/30">
+                            <i class="fas fa-rocket mr-1.5"></i> @Model.Data.AktifProjeSayisi yayında
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent-500 to-orange-600 flex items-center justify-center shadow-lg shadow-accent-500/30 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-layer-group text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onay Bekleyen -->
+            <div class="glass-card p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">İşlem Bekleyen</p>
+                        <h3 class="text-3xl font-black text-petrol-800 dark:text-white mt-2">@Model.Data.BekleyenOnaySayisi</h3>
+                        <div class="mt-2 inline-flex items-center text-xs font-medium text-red-600 bg-red-50 dark:bg-red-900/20 px-2.5 py-1 rounded-lg border border-red-100 dark:border-red-900/30 cursor-pointer hover:bg-red-100 transition-colors">
+                            <i class="fas fa-bell mr-1.5"></i> İncele
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg shadow-rose-500/30 group-hover:scale-110 transition-transform group-hover:rotate-12">
+                        <i class="fas fa-clock text-white text-xl"></i>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Toplam Proje -->
-    <div class="stat-card bg-gradient-to-br from-amber-500 to-amber-600 group">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-white/80 text-sm font-medium">Toplam Proje</p>
-                <h3 class="text-3xl font-bold text-white mt-2">@Model.Data.ToplamProjeSayisi</h3>
-                <p class="text-white/60 text-xs mt-1">
-                    <span class="text-green-300">+@Model.Data.BuAyYeniProje</span> bu ay
-                </p>
+        <!-- Grafikler -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+
+            <!-- Line Chart -->
+            <div class="lg:col-span-2 glass-card rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <h3 class="font-bold text-petrol-900 dark:text-white flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-accent-500 rounded-full"></span>
+                        Kullanıcı Kayıt Trendi
+                    </h3>
+                    <button class="text-xs font-medium text-gray-400 hover:text-accent-500 transition-colors">
+                        <i class="fas fa-download mr-1"></i> Rapor Al
+                    </button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
             </div>
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <i class="fas fa-rocket text-3xl text-white"></i>
+
+            <!-- Doughnut Chart -->
+            <div class="glass-card rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <h3 class="font-bold text-petrol-900 dark:text-white flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-purple-500 rounded-full"></span>
+                        Proje Durumları
+                    </h3>
+                </div>
+                <div class="chart-container" style="height: 250px;">
+                    <canvas id="projectStatusChart"></canvas>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Bekleyen Onaylar -->
-    <div class="stat-card bg-gradient-to-br from-red-500 to-red-600 group">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-white/80 text-sm font-medium">Bekleyen Onay</p>
-                <h3 class="text-3xl font-bold text-white mt-2">@Model.Data.BekleyenOnaylar.ToplamBekleyen</h3>
-                <p class="text-white/60 text-xs mt-1">Hemen incele</p>
+        <!-- Son Aktiviteler Tablosu -->
+        <div class="glass-card rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                <h3 class="font-bold text-petrol-900 dark:text-white flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                    Son Sistem Aktiviteleri
+                </h3>
+                <a href="#" class="text-xs font-bold text-accent-500 hover:text-accent-600 flex items-center gap-1 transition-colors">
+                    Tümünü Gör <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                <i class="fas fa-clock text-3xl text-white"></i>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Grafikler Row -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <!-- Aylık Kullanıcı Kayıtları (Line Chart) -->
-    <div class="card-modern p-6">
-        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
-            <i class="fas fa-chart-line mr-2 text-petrol-600"></i>
-            Aylık Kullanıcı Kayıtları
-        </h3>
-        <canvas id="monthlyUsersChart"></canvas>
-    </div>
-
-    <!-- Proje Durum Dağılımı (Pie Chart) -->
-    <div class="card-modern p-6">
-        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
-            <i class="fas fa-chart-pie mr-2 text-purple-600"></i>
-            Proje Durum Dağılımı
-        </h3>
-        <canvas id="projectStatusChart"></canvas>
-    </div>
-</div>
-
-<!-- En Aktif Kullanıcılar -->
-<div class="card-modern p-6">
-    <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
-        <i class="fas fa-trophy mr-2 text-amber-500"></i>
-        En Aktif Kullanıcılar
-    </h3>
-    <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead>
-                <tr class="border-b border-gray-200 dark:border-petrol-700">
-                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Sıra</th>
-                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Kullanıcı</th>
-                    <th class="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Projeler</th>
-                    <th class="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Gönderiler</th>
-                    <th class="text-center py-3 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300">Aktivite Puanı</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var (kullanici, index) in Model.Data.EnAktifKullanicilar.Select((k, i) => (k, i)))
-                {
-                    <tr class="border-b border-gray-100 dark:border-petrol-800 hover:bg-gray-50 dark:hover:bg-petrol-700/30 transition-colors">
-                        <td class="py-3 px-4">
-                            @if (index < 3)
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left border-b border-gray-100 dark:border-gray-700/50">
+                            <th class="pb-4 pl-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Kullanıcı</th>
+                            <th class="pb-4 text-xs font-bold text-gray-400 uppercase tracking-wider">İşlem</th>
+                            <th class="pb-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Detay</th>
+                            <th class="pb-4 pr-2 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Zaman</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700/50">
+                        @if (Model.Data.SonAktiviteler.Any())
+                        {
+                            @foreach (var item in Model.Data.SonAktiviteler)
                             {
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white font-bold text-sm">
-                                    @(index + 1)
-                                </span>
+                                <tr class="group table-row-hover transition-colors">
+                                    <td class="py-4 pl-2">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-petrol-800 dark:to-petrol-700 flex items-center justify-center text-petrol-700 dark:text-petrol-300 font-bold text-xs shadow-sm ring-2 ring-white dark:ring-petrol-900">
+                                                @item.BasHarf
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-bold text-gray-700 dark:text-gray-200">@item.KullaniciAdi</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                    @(item.IslemTuru == "Create" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800" :
+                                                                                            item.IslemTuru == "Delete" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800" :
+                                                                                            "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200 dark:border-blue-800")">
+                                            @item.IslemTuru
+                                        </span>
+                                    </td>
+                                    <td class="py-4 text-sm text-gray-600 dark:text-gray-400 truncate max-w-xs">@item.Ozet</td>
+                                    <td class="py-4 pr-2 text-right text-xs font-mono font-medium text-gray-500">@item.Tarih.ToString("dd.MM HH:mm")</td>
+                                </tr>
                             }
-                            else
-                            {
-                                <span class="text-gray-500 dark:text-gray-400 font-semibold">@(index + 1)</span>
-                            }
-                        </td>
-                        <td class="py-3 px-4">
-                            <div class="flex items-center space-x-3">
-                                @if (!string.IsNullOrEmpty(kullanici.ProfilFotoUrl))
-                                {
-                                    <img src="@kullanici.ProfilFotoUrl" alt="@kullanici.AdSoyad" class="w-10 h-10 rounded-full object-cover" />
-                                }
-                                else
-                                {
-                                    <div class="w-10 h-10 bg-gradient-to-br from-petrol-400 to-petrol-600 rounded-full flex items-center justify-center text-white font-bold">
-                                        @kullanici.AdSoyad.Substring(0, 2).ToUpper()
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="py-8 text-center text-gray-500">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <i class="fas fa-inbox text-2xl text-gray-300"></i>
+                                        <span>Henüz kayıt bulunamadı.</span>
                                     </div>
-                                }
-                                <span class="font-medium text-gray-900 dark:text-white">@kullanici.AdSoyad</span>
-                            </div>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-petrol-100 dark:bg-petrol-700 text-petrol-800 dark:text-petrol-200">
-                                @kullanici.ProjeSayisi
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200">
-                                @kullanici.GonderiSayisi
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="text-lg font-bold text-amber-600 dark:text-amber-400">@kullanici.AktivitePuani</span>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 </div>
 
 @section Scripts {
     <script>
-        // Aylık Kullanıcı Kayıtları Line Chart
-        const monthlyUsersCtx = document.getElementById('monthlyUsersChart').getContext('2d');
-        new Chart(monthlyUsersCtx, {
+        // --- Grafik Konfigürasyonları ---
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#94a3b8' : '#64748b';
+        const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+        // 1. Line Chart
+        const ctxUser = document.getElementById('userGrowthChart').getContext('2d');
+        let gradient = ctxUser.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(249, 115, 22, 0.5)');
+        gradient.addColorStop(1, 'rgba(249, 115, 22, 0.0)');
+
+        new Chart(ctxUser, {
             type: 'line',
             data: {
-                labels: @Html.Raw(Json.Serialize(Model.Data.AylikKayitlar.Select(a => a.Ay))),
+                labels: @Html.Raw(Json.Serialize(Model.Data.GrafikAylar)),
                 datasets: [{
-                    label: 'Yeni Kullanıcılar',
-                    data: @Html.Raw(Json.Serialize(Model.Data.AylikKayitlar.Select(a => a.Deger))),
-                    borderColor: 'rgb(20, 184, 166)',
-                    backgroundColor: 'rgba(20, 184, 166, 0.1)',
-                    tension: 0.4,
+                    label: 'Yeni Üye',
+                    data: @Html.Raw(Json.Serialize(Model.Data.GrafikKullaniciVerileri)),
+                    borderColor: '#f97316',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
                     fill: true,
-                    pointBackgroundColor: 'rgb(20, 184, 166)',
-                    pointBorderColor: '#fff',
+                    tension: 0.4,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#f97316',
                     pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 7
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                        titleColor: isDark ? '#f1f5f9' : '#0f172a',
+                        bodyColor: isDark ? '#cbd5e1' : '#334155',
+                        borderColor: isDark ? '#334155' : '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false,
+                        cornerRadius: 8
                     }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
+                        grid: { color: gridColor, borderDash: [4, 4] },
+                        ticks: { color: textColor, padding: 10 }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: textColor, padding: 10 }
                     }
-                }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
             }
         });
 
-        // Proje Durum Dağılımı Pie Chart
-        const projectStatusCtx = document.getElementById('projectStatusChart').getContext('2d');
-        new Chart(projectStatusCtx, {
+        // 2. Doughnut Chart
+        const ctxProject = document.getElementById('projectStatusChart').getContext('2d');
+        new Chart(ctxProject, {
             type: 'doughnut',
             data: {
-                labels: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Durum))),
+                labels: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(x => x.Durum))),
                 datasets: [{
-                    data: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Sayi))),
-                    backgroundColor: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Renk))),
+                    data: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(x => x.Sayi))),
+                    backgroundColor: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(x => x.Renk))),
                     borderWidth: 2,
-                    borderColor: '#fff'
+                    borderColor: isDark ? '#1e293b' : '#ffffff',
+                    hoverOffset: 4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutout: '75%',
                 plugins: {
                     legend: {
                         position: 'right',
                         labels: {
-                            boxWidth: 15,
-                            padding: 15
+                            color: textColor,
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { family: "'Inter', sans-serif", size: 12 }
                         }
                     }
                 }

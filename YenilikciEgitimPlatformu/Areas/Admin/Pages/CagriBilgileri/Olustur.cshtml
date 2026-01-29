@@ -1,0 +1,370 @@
+﻿@page
+@model YenilikciEgitimPlatformu.Areas.Admin.Pages.CagriBilgileri.OlusturModel
+@{
+    ViewData["Title"] = "Yeni Çağrı Oluştur";
+    Layout = "~/Pages/Shared/_LayoutDashboard.cshtml";
+}
+
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Yeni Çağrı Oluştur</h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            Resmi kurum çağrısı, yarışma veya etkinlik ekleyin
+        </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card-modern rounded-xl p-6 md:p-8">
+        <form method="post" id="cagriForm">
+            <div asp-validation-summary="All" class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 hidden"></div>
+
+            <div class="space-y-6">
+                <!-- Temel Bilgiler -->
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        <i class="fas fa-info-circle text-petrol-500 mr-2"></i>
+                        Temel Bilgiler
+                    </h3>
+
+                    <!-- Başlık -->
+                    <div class="floating-label-group mb-6">
+                        <input asp-for="Input.Baslik"
+                               type="text"
+                               id="baslik"
+                               placeholder=" "
+                               maxlength="300"
+                               class="peer" />
+                        <label for="baslik">Çağrı Başlığı *</label>
+                        <span asp-validation-for="Input.Baslik" class="text-red-500 text-sm mt-1"></span>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <i class="fas fa-lightbulb"></i> Örn: "TÜBİTAK 2204-A Ortaöğretim Öğrencileri Araştırma Projeleri Yarışması"
+                        </p>
+                    </div>
+
+                    <!-- Kısa Açıklama -->
+                    <div class="floating-label-group mb-6">
+                        <textarea asp-for="Input.KisaAciklama"
+                                  id="kisaAciklama"
+                                  rows="3"
+                                  placeholder=" "
+                                  maxlength="500"
+                                  class="peer"></textarea>
+                        <label for="kisaAciklama">Kısa Açıklama *</label>
+                        <span asp-validation-for="Input.KisaAciklama" class="text-red-500 text-sm mt-1"></span>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Liste görünümünde gösterilecek özet açıklama (Max 500 karakter)
+                        </p>
+                    </div>
+
+                    <!-- Detaylı Açıklama -->
+                    <div class="floating-label-group mb-6">
+                        <textarea asp-for="Input.Aciklama"
+                                  id="aciklama"
+                                  rows="8"
+                                  placeholder=" "
+                                  class="peer"></textarea>
+                        <label for="aciklama">Detaylı Açıklama *</label>
+                        <span asp-validation-for="Input.Aciklama" class="text-red-500 text-sm mt-1"></span>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Çağrının tüm detaylarını, koşullarını ve gereksinimlerini yazın
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Çağrı Detayları -->
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        <i class="fas fa-clipboard-list text-petrol-500 mr-2"></i>
+                        Çağrı Detayları
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Çağrı Türü -->
+                        <div class="floating-label-group">
+                            <select asp-for="Input.Turu"
+                                    id="turu"
+                                    asp-items="Html.GetEnumSelectList<YenilikciEgitimPlatformu.Models.CagriTuru>()"
+                                    class="peer">
+                                <option value="">Seçiniz...</option>
+                            </select>
+                            <label for="turu">Çağrı Türü *</label>
+                            <span asp-validation-for="Input.Turu" class="text-red-500 text-sm mt-1"></span>
+                        </div>
+
+                        <!-- Düzenleyen Kurum -->
+                        <div class="floating-label-group">
+                            <input asp-for="Input.Kurum"
+                                   type="text"
+                                   id="kurum"
+                                   placeholder=" "
+                                   maxlength="200"
+                                   class="peer" />
+                            <label for="kurum">Düzenleyen Kurum *</label>
+                            <span asp-validation-for="Input.Kurum" class="text-red-500 text-sm mt-1"></span>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Örn: TÜBİTAK, MEB, TEKNOFEST
+                            </p>
+                        </div>
+
+                        <!-- Başlangıç Tarihi -->
+                        <div class="floating-label-group">
+                            <input asp-for="Input.BaslangicTarihi"
+                                   type="date"
+                                   id="baslangicTarihi"
+                                   class="peer" />
+                            <label for="baslangicTarihi">Başlangıç Tarihi *</label>
+                            <span asp-validation-for="Input.BaslangicTarihi" class="text-red-500 text-sm mt-1"></span>
+                        </div>
+
+                        <!-- Bitiş Tarihi -->
+                        <div class="floating-label-group">
+                            <input asp-for="Input.BitisTarihi"
+                                   type="date"
+                                   id="bitisTarihi"
+                                   class="peer" />
+                            <label for="bitisTarihi">Bitiş Tarihi</label>
+                            <span asp-validation-for="Input.BitisTarihi" class="text-red-500 text-sm mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- İletişim Bilgileri -->
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        <i class="fas fa-address-card text-petrol-500 mr-2"></i>
+                        İletişim ve Başvuru
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Başvuru Linki -->
+                        <div class="floating-label-group md:col-span-2">
+                            <input asp-for="Input.BasvuruLinki"
+                                   type="url"
+                                   id="basvuruLinki"
+                                   placeholder=" "
+                                   class="peer" />
+                            <label for="basvuruLinki">Başvuru Linki</label>
+                            <span asp-validation-for="Input.BasvuruLinki" class="text-red-500 text-sm mt-1"></span>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Online başvuru sayfası URL'si (https://... ile başlamalı)
+                            </p>
+                        </div>
+
+                        <!-- İletişim E-posta -->
+                        <div class="floating-label-group">
+                            <input asp-for="Input.IletisimEmail"
+                                   type="email"
+                                   id="iletisimEmail"
+                                   placeholder=" "
+                                   class="peer" />
+                            <label for="iletisimEmail">İletişim E-posta</label>
+                            <span asp-validation-for="Input.IletisimEmail" class="text-red-500 text-sm mt-1"></span>
+                        </div>
+
+                        <!-- İletişim Telefon -->
+                        <div class="floating-label-group">
+                            <input asp-for="Input.IletisimTelefon"
+                                   type="tel"
+                                   id="iletisimTelefon"
+                                   placeholder=" "
+                                   class="peer" />
+                            <label for="iletisimTelefon">İletişim Telefon</label>
+                            <span asp-validation-for="Input.IletisimTelefon" class="text-red-500 text-sm mt-1"></span>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Örn: +90 (312) 123 45 67
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hedef Kitle -->
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        <i class="fas fa-users text-petrol-500 mr-2"></i>
+                        Hedef Kitle ve Konum
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Hedef Kitle -->
+                        <div class="floating-label-group md:col-span-2">
+                            <textarea asp-for="Input.HedefKitle"
+                                      id="hedefKitle"
+                                      rows="3"
+                                      placeholder=" "
+                                      class="peer"></textarea>
+                            <label for="hedefKitle">Hedef Kitle</label>
+                            <span asp-validation-for="Input.HedefKitle" class="text-red-500 text-sm mt-1"></span>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Örn: "Ortaöğretim 9-12. sınıf öğrencileri", "Tüm öğretmenler"
+                            </p>
+                        </div>
+
+                        <!-- Hedef İl -->
+                        <div class="floating-label-group">
+                            <select asp-for="Input.HedefIlId"
+                                    id="hedefIlId"
+                                    asp-items="Model.Iller"
+                                    class="peer">
+                                <option value="">Tüm Türkiye</option>
+                            </select>
+                            <label for="hedefIlId">Hedef İl</label>
+                            <span asp-validation-for="Input.HedefIlId" class="text-red-500 text-sm mt-1"></span>
+                        </div>
+
+                        <!-- Hedef İlçe -->
+                        <div class="floating-label-group">
+                            <select asp-for="Input.HedefIlceId"
+                                    id="hedefIlceId"
+                                    asp-items="Model.Ilceler"
+                                    class="peer"
+                                    disabled>
+                                <option value="">Önce İl Seçin</option>
+                            </select>
+                            <label for="hedefIlceId">Hedef İlçe</label>
+                            <span asp-validation-for="Input.HedefIlceId" class="text-red-500 text-sm mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <a asp-page="./Index"
+                   class="px-6 py-2.5 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-times mr-2"></i>
+                    İptal
+                </a>
+                <button type="submit"
+                        id="submitBtn"
+                        class="px-6 py-2.5 text-white bg-gradient-to-r from-petrol-500 to-petrol-600 rounded-lg hover:from-petrol-600 hover:to-petrol-700 transition-all shadow-lg hover:shadow-xl">
+                    <i class="fas fa-save mr-2"></i>
+                    Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Form Submission Handler
+        document.getElementById('cagriForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Kaydediliyor...';
+
+            try {
+                const formData = new FormData(this);
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı!',
+                        text: 'Çağrı başarıyla oluşturuldu',
+                        confirmButtonColor: '#0f3460',
+                        timer: 2000
+                    });
+                    window.location.href = '@Url.Page("./Index")';
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Bir hata oluştu');
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: error.message || 'Çağrı kaydedilirken bir hata oluştu',
+                    confirmButtonColor: '#e94560'
+                });
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // İl-İlçe Bağımlılığı
+        document.getElementById('hedefIlId').addEventListener('change', async function() {
+            const ilId = this.value;
+            const ilceSelect = document.getElementById('hedefIlceId');
+
+            ilceSelect.disabled = true;
+            ilceSelect.innerHTML = '<option value="">Yükleniyor...</option>';
+
+            if (!ilId) {
+                ilceSelect.innerHTML = '<option value="">Önce İl Seçin</option>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/konum/ilceler?ilId=${ilId}`);
+                const ilceler = await response.json();
+
+                ilceSelect.innerHTML = '<option value="">Tüm İlçeler</option>';
+                ilceler.forEach(ilce => {
+                    const option = document.createElement('option');
+                    option.value = ilce.id;
+                    option.textContent = ilce.ad;
+                    ilceSelect.appendChild(option);
+                });
+                ilceSelect.disabled = false;
+            } catch (error) {
+                ilceSelect.innerHTML = '<option value="">Hata oluştu</option>';
+            }
+        });
+
+        // Tarih Validasyonu
+        document.getElementById('bitisTarihi').addEventListener('change', function() {
+            const baslangic = document.getElementById('baslangicTarihi').value;
+            const bitis = this.value;
+
+            if (baslangic && bitis && new Date(bitis) < new Date(baslangic)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Dikkat!',
+                    text: 'Bitiş tarihi başlangıç tarihinden önce olamaz',
+                    confirmButtonColor: '#e94560'
+                });
+                this.value = '';
+            }
+        });
+    </script>
+}
+
+@* 
+SAYFA AÇIKLAMASI:
+==================
+Admin Çağrı Oluşturma Sayfası
+
+Özellikler:
+- Modern form tasarımı (Floating labels)
+- Glassmorphism card
+- Responsive layout
+- Client & Server validation
+- SweetAlert2 feedback
+- İl-İlçe cascade dropdown
+- Tarih validasyonu
+- Loading states
+
+Kullanılan Teknolojiler:
+- Tailwind CSS
+- Font Awesome
+- SweetAlert2
+- ASP.NET Validation
+
+Bölümler:
+1. Temel Bilgiler
+2. Çağrı Detayları
+3. İletişim ve Başvuru
+4. Hedef Kitle ve Konum
+*@

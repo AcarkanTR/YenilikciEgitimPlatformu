@@ -8,7 +8,7 @@
     var isAdmin = User.IsInRole("Admin");
     var pageTitle = ViewData["Title"]?.ToString() ?? "Panel";
 
-    // Kullanıcı Adı/Soyadı Güvenli Alma (Null Check)
+    // Kullanıcı Adı/Soyadı
     var ad = user?.Ad ?? "";
     var soyad = user?.Soyad ?? "";
     var tamAd = $"{ad} {soyad}".Trim();
@@ -20,7 +20,6 @@
     if (string.IsNullOrEmpty(basHarfler) && !string.IsNullOrEmpty(user?.UserName))
         basHarfler = user.UserName.Substring(0, 1).ToUpper();
 
-    // Aktif sayfa belirleme
     var currentPath = Context.Request.Path.ToString().ToLower();
 }
 
@@ -29,9 +28,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@pageTitle - Yenilikçi Eğitim Platformu</title>
+    <title>@pageTitle - YEP Panel</title>
 
-    <!-- Tailwind CSS (Runtime Config - MASTER PROMPT UYUMLU) -->
+    <!-- Tailwind CSS (Ana Site ile Senkronize Config) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -39,7 +38,6 @@
             theme: {
                 extend: {
                     colors: {
-                        // Eski petrol renklerini uyumluluk için koruyoruz ama tonları güncelliyoruz
                         petrol: {
                             50: '#f0fdfa',
                             100: '#ccfbf1',
@@ -63,17 +61,20 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     animation: {
+                        'blob': 'blob 7s infinite',
+                        'spin-slow': 'spin 12s linear infinite',
                         'fade-in': 'fadeIn 0.5s ease-out',
-                        'slide-up': 'slideUp 0.5s ease-out',
                     },
                     keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         },
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
                         }
                     }
                 }
@@ -84,21 +85,15 @@
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
-    <!-- Chart.js -->
+    <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
-
-    <!-- Site CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
+    <!-- Anti-Flash Script (Sayfa Yüklenmeden Çalışmalı) -->
     <script>
-        // Dark mode flash önleme (Prompt Requirement)
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -106,261 +101,287 @@
     </script>
 
     <style>
-        /* Glassmorphism Utilities */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        /* Sidebar Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .dark .glass-panel {
-            background: rgba(22, 33, 62, 0.7); /* Primary-800 based */
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
         }
 
-        .glass-sidebar {
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 20px;
+        }
+
+        /* Modern Glass Effect */
+        .glass-header {
             background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
-        .dark .glass-sidebar {
-            background: rgba(15, 23, 42, 0.95); /* Darker */
+        .dark .glass-header {
+            background: rgba(0, 43, 54, 0.9); /* Petrol-900 with opacity */
         }
 
-        /* Sidebar Link Active State */
+        /* Nav Link Styles - HOVER EFFECT EKLENDİ */
         .nav-link {
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
         }
 
-            .nav-link::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                width: 4px;
-                background: #f97316; /* Accent-500 */
-                transform: scaleY(0);
-                transition: transform 0.3s ease;
-                border-top-right-radius: 4px;
-                border-bottom-right-radius: 4px;
-            }
-
-            .nav-link:hover::before, .nav-link.active::before {
-                transform: scaleY(1);
+            .nav-link:hover {
+                background-color: rgba(20, 184, 166, 0.1); /* Petrol-500 opacity */
+                color: #0d9488; /* Petrol-600 */
+                border-left-color: #f97316; /* Accent-500 (Turuncu Kenarlık) */
             }
 
             .nav-link.active {
-                background: rgba(249, 115, 22, 0.1); /* Accent with opacity */
-                color: #f97316;
+                background-color: rgba(20, 184, 166, 0.15);
+                color: #0f766e; /* Petrol-700 */
+                border-left-color: #f97316; /* Accent-500 */
             }
 
+        .dark .nav-link:hover {
+            background-color: rgba(20, 184, 166, 0.2);
+            color: #5eead4; /* Petrol-300 */
+            border-left-color: #f97316;
+        }
+
         .dark .nav-link.active {
-            background: rgba(249, 115, 22, 0.15);
-            color: #fb923c; /* Accent-400 */
+            background-color: rgba(20, 184, 166, 0.2);
+            color: #5eead4;
+            border-left-color: #f97316;
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-primary-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300">
+<body class="bg-gray-50 dark:bg-petrol-950 text-slate-800 dark:text-gray-200 font-sans transition-colors duration-300 flex h-screen overflow-hidden">
 
     <!-- Mobile Overlay -->
-    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden glass-panel" onclick="toggleSidebar()"></div>
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
 
-    <!-- Sidebar (Glassmorphism + Fixed) -->
-    <aside id="sidebar" class="fixed top-0 left-0 z-50 h-screen w-72 transition-transform -translate-x-full lg:translate-x-0 border-r border-gray-200 dark:border-primary-800 glass-sidebar flex flex-col shadow-2xl">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-72 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 bg-white dark:bg-petrol-900 border-r border-gray-200 dark:border-petrol-800 flex flex-col shadow-xl">
 
-        <!-- Logo Area -->
-        <div class="h-20 flex items-center px-6 border-b border-gray-100 dark:border-primary-800 bg-gradient-to-r from-primary-800 to-primary-700 text-white">
-            <a asp-page="/Index" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <i class="fas fa-graduation-cap text-accent-500 text-xl"></i>
+        <!-- 1. Logo Bölümü (Güncellendi) -->
+        <div class="h-20 flex items-center px-6 border-b border-gray-100 dark:border-petrol-800">
+            <a asp-page="/Index" class="flex items-center gap-3 group w-full">
+                <!-- Icon -->
+                <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-petrol-600 to-petrol-500 flex items-center justify-center shadow-md transition-transform duration-300 group-hover:scale-105">
+                    <i class="fas fa-graduation-cap text-white text-lg"></i>
                 </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight">YEP Panel</h1>
-                    <p class="text-[10px] text-gray-300 uppercase tracking-wider">Yönetim Paneli</p>
+                <!-- Text -->
+                <div class="leading-tight">
+                    <span class="block text-xl font-bold tracking-tight text-petrol-800 dark:text-white group-hover:text-accent-500 transition-colors">
+                        YEP<span class="text-accent-500">Panel</span>
+                    </span>
+                    <span class="block text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                        Yönetim Sistemi
+                    </span>
                 </div>
             </a>
-            <!-- Mobile Close Button -->
-            <button class="lg:hidden ml-auto text-white/70 hover:text-white" onclick="toggleSidebar()">
-                <i class="fas fa-times"></i>
+            <!-- Mobile Close -->
+            <button class="lg:hidden ml-auto text-gray-500 hover:text-red-500" onclick="toggleSidebar()">
+                <i class="fas fa-times text-xl"></i>
             </button>
         </div>
 
-        <!-- User Profile Summary (Sidebar Top) -->
-        <div class="p-6 pb-2">
-            <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-primary-800/50 border border-gray-100 dark:border-primary-700">
-                <div class="relative">
-                    @if (!string.IsNullOrEmpty(user?.ProfilFotografiUrl))
-                    {
-                        <img src="@user.ProfilFotografiUrl" alt="@tamAd" class="w-12 h-12 rounded-full object-cover border-2 border-accent-500 shadow-md" />
-                    }
-                    else
-                    {
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-600 to-primary-800 text-white flex items-center justify-center font-bold text-lg border-2 border-white dark:border-primary-700 shadow-md">
-                            @basHarfler
-                        </div>
-                    }
-                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-primary-800 rounded-full"></div>
+        <!-- 2. Kullanıcı Profil Kartı (Modernize Edildi & Hata Düzeltildi) -->
+        <div class="p-4">
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-gray-50 to-white dark:from-petrol-800 dark:to-petrol-900 border border-gray-100 dark:border-petrol-700 shadow-sm relative overflow-hidden group">
+
+                <!-- Dekoratif Arkaplan -->
+                <div class="absolute top-0 right-0 -mr-4 -mt-4 w-20 h-20 bg-accent-500/10 rounded-full blur-xl group-hover:bg-accent-500/20 transition-all"></div>
+
+                <div class="flex items-center gap-3 relative z-10">
+                    <div class="relative">
+                        @if (!string.IsNullOrEmpty(user?.ProfilFotografiUrl))
+                        {
+                            <img src="@user.ProfilFotografiUrl" alt="@tamAd" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-petrol-600 shadow-md" />
+                        }
+                        else
+                        {
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-petrol-500 to-petrol-700 text-white flex items-center justify-center font-bold text-lg border-2 border-white dark:border-petrol-600 shadow-md">
+                                @basHarfler
+                            </div>
+                        }
+                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-petrol-800 rounded-full"></div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white truncate">@tamAd</h3>
+                        <p class="text-xs text-petrol-600 dark:text-petrol-300 font-medium truncate">
+                            @(isAdmin ? "Sistem Yöneticisi" : "Platform Üyesi")
+                        </p>
+                    </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <h3 class="text-sm font-bold text-gray-900 dark:text-white truncate">@tamAd</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">@(isAdmin ? "Yönetici" : "Kullanıcı")</p>
+
+                <div class="mt-3 flex gap-2">
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index" class="flex-1 text-center py-1.5 text-xs font-semibold rounded-lg bg-white dark:bg-petrol-700 border border-gray-200 dark:border-petrol-600 text-gray-600 dark:text-gray-300 hover:text-accent-500 hover:border-accent-500 transition-colors">
+                        Profil
+                    </a>
+                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post" class="flex-1">
+                        <button type="submit" class="w-full py-1.5 text-xs font-semibold rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 border border-transparent transition-colors">
+                            Çıkış
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto py-4 px-4 space-y-1 custom-scrollbar">
+        <!-- 3. Navigasyon (Genişletildi) -->
+        <nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar">
 
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-2">Menü</p>
-
+            <!-- Admin Menüsü -->
             @if (isAdmin)
             {
-                <a asp-area="Admin" asp-page="/Dashboard/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/admin/dashboard") ? "active" : "")">
-                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
-                        <i class="fas fa-chart-pie"></i>
-                    </span>
-                    Genel Bakış
+                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-2 px-2">Yönetim</div>
+
+                <a asp-area="Admin" asp-page="/Dashboard/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/dashboard") ? "active" : "")">
+                    <i class="fas fa-chart-pie w-5 text-center"></i> Genel Bakış
                 </a>
 
-                <a asp-area="Admin" asp-page="/Kullanicilar/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/admin/kullanicilar") ? "active" : "")">
-                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
-                        <i class="fas fa-users-cog"></i>
-                    </span>
-                    Kullanıcılar
+                <a asp-area="Admin" asp-page="/Okullar/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/okullar") ? "active" : "")">
+                    <i class="fas fa-school w-5 text-center"></i> Okul Yönetimi
                 </a>
 
-                <a asp-area="Admin" asp-page="/Icerik/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/admin/icerik") ? "active" : "")">
-                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
-                        <i class="fas fa-layer-group"></i>
-                    </span>
-                    İçerik Yönetimi
-                </a>
-            }
-            else
-            {
-                <a asp-area="User" asp-page="/Dashboard/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/user/dashboard") ? "active" : "")">
-                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
-                        <i class="fas fa-home"></i>
-                    </span>
-                    Panelim
+                <a asp-area="Admin" asp-page="/Kullanicilar/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/kullanicilar") ? "active" : "")">
+                    <i class="fas fa-users-cog w-5 text-center"></i> Kullanıcılar
                 </a>
 
-                <a asp-area="User" asp-page="/Projeler/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/user/projeler") ? "active" : "")">
-                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
-                        <i class="fas fa-rocket"></i>
-                    </span>
-                    Projelerim
+                <a asp-area="Admin" asp-page="/Icerik/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/icerik") ? "active" : "")">
+                    <i class="fas fa-layer-group w-5 text-center"></i> İçerik Yönetimi
                 </a>
 
-                <a asp-area="User" asp-page="/Basvurularim/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/user/basvurularim") ? "active" : "")">
-                    <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
-                        <i class="fas fa-clipboard-check"></i>
-                    </span>
-                    Başvurularım
+                <a asp-area="Admin" asp-page="/Raporlar/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/raporlar") ? "active" : "")">
+                    <i class="fas fa-file-invoice-dollar w-5 text-center"></i> Raporlar
+                </a>
+
+                <!-- Çağrı Bilgisi Sistemi (Sistem 1) -->
+                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Çağrı Yönetimi</div>
+
+                <a asp-area="Admin" asp-page="/CagriBilgileri/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/cagribilgileri") && !currentPath.Contains("olustur") ? "active" : "")">
+                    <i class="fas fa-bullhorn w-5 text-center"></i> Çağrı Listesi
+                </a>
+
+                <a asp-area="Admin" asp-page="/CagriBilgileri/Olustur" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/cagribilgileri/olustur") ? "active" : "")">
+                    <i class="fas fa-plus-circle w-5 text-center"></i> Yeni Çağrı
+                </a>
+
+                <!-- Proje Yönetimi (Sistem 2) -->
+                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Proje Yönetimi</div>
+
+                <a asp-area="Admin" asp-page="/ProjeYonetimi/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/projeyonetimi") ? "active" : "")">
+                    <i class="fas fa-tasks w-5 text-center"></i> Projeler
                 </a>
             }
 
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">Hesap</p>
+            <!-- Kullanıcı Menüsü -->
+            <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Kişisel</div>
 
-            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group @(currentPath.Contains("/account/manage") ? "active" : "")">
-                <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
-                    <i class="fas fa-user-cog"></i>
-                </span>
-                Profil Ayarları
+            <a asp-area="User" asp-page="/Dashboard/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/user/dashboard") ? "active" : "")">
+                <i class="fas fa-home w-5 text-center"></i> Panelim
             </a>
 
-            <a href="/" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-700 dark:hover:text-white group">
-                <span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-primary-800 flex items-center justify-center text-gray-500 group-hover:text-accent-500 group-hover:bg-accent-50 dark:group-hover:bg-primary-700 transition-colors">
-                    <i class="fas fa-globe"></i>
-                </span>
-                Siteye Dön
+            <a asp-area="User" asp-page="/Projeler/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/user/projeler") ? "active" : "")">
+                <i class="fas fa-rocket w-5 text-center"></i> Projelerim
             </a>
 
-            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post" class="mt-auto px-4 py-4">
-                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-red-600 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Güvenli Çıkış
-                </button>
-            </form>
+            <a asp-area="User" asp-page="/Iceriklerim/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/user/iceriklerim") ? "active" : "")">
+                <i class="fas fa-feather-alt w-5 text-center"></i> İçeriklerim
+            </a>
+
+            <a asp-area="User" asp-page="/Basvurularim/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/user/basvurularim") ? "active" : "")">
+                <i class="fas fa-clipboard-check w-5 text-center"></i> Başvurular
+            </a>
+
+            <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Topluluk</div>
+
+            <a asp-area="User" asp-page="/Mesajlar/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/user/mesajlar") ? "active" : "")">
+                <div class="relative">
+                    <i class="fas fa-envelope w-5 text-center"></i>
+                    <!-- Badge Example -->
+                    <span class="absolute -top-1 -right-1 flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-accent-500"></span>
+                    </span>
+                </div>
+                Mesajlar
+            </a>
+            <a asp-area="User" asp-page="/Takip/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/user/takip") ? "active" : "")">
+                <i class="fas fa-user-friends w-5 text-center"></i> Takip & Sosyal
+            </a>
+
         </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-gray-100 dark:border-petrol-800">
+            <a href="/" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gray-50 dark:bg-petrol-800 text-sm font-semibold text-petrol-700 dark:text-petrol-300 hover:bg-gray-100 dark:hover:bg-petrol-700 transition-colors">
+                <i class="fas fa-globe"></i> Siteye Dön
+            </a>
+        </div>
     </aside>
 
-    <!-- Main Content Wrapper -->
-    <div class="lg:ml-72 flex flex-col min-h-screen transition-all duration-300">
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
 
-        <!-- Sticky Top Navbar (Glassmorphism) -->
-        <header class="sticky top-0 z-30 h-20 glass-panel border-b border-gray-200 dark:border-primary-800">
-            <div class="h-full px-6 flex items-center justify-between">
+        <!-- HEADER (Glassmorphism & Theme Toggle Fixed) -->
+        <header class="h-20 glass-header border-b border-gray-200 dark:border-petrol-800 flex items-center justify-between px-6 lg:px-8 z-30 shrink-0">
 
-                <!-- Left: Mobile Toggle & Title -->
-                <div class="flex items-center gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-primary-800 transition-colors">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
+            <!-- Left: Mobile Toggle & Page Title -->
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-petrol-800 transition-colors">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
 
-                    <div>
-                        <h2 class="text-xl font-bold text-primary-700 dark:text-white leading-tight">@pageTitle</h2>
-                        @if (ViewData["Subtitle"] != null)
-                        {
-                            <p class="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">@ViewData["Subtitle"]</p>
-                        }
-                    </div>
+                <div class="animate-fade-in">
+                    <h2 class="text-xl font-bold text-petrol-800 dark:text-white leading-tight">@pageTitle</h2>
+                    @if (ViewData["Subtitle"] != null)
+                    {
+                        <p class="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">@ViewData["Subtitle"]</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-3">
+
+                <!-- Search -->
+                <div class="hidden md:block relative group">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-accent-500 transition-colors"></i>
+                    <input type="text" placeholder="Panelde ara..." class="pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-petrol-800 border border-transparent focus:border-accent-500 focus:ring-0 text-sm w-48 transition-all focus:w-64 dark:text-white placeholder-gray-500" />
                 </div>
 
-                <!-- Right: Actions -->
-                <div class="flex items-center gap-3 sm:gap-4">
+                <!-- Theme Toggle (Dönen Güneş/Ay Animasyonu) -->
+                <button id="theme-toggle" type="button" class="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-petrol-800 transition-colors flex items-center justify-center relative overflow-hidden group">
+                    <i id="theme-toggle-light-icon" class="fas fa-sun text-accent-500 text-xl hidden animate-spin-slow"></i>
+                    <i id="theme-toggle-dark-icon" class="fas fa-moon text-petrol-600 dark:text-white text-xl hidden group-hover:scale-110 transition-transform"></i>
+                </button>
 
-                    <!-- Search (Hidden Mobile) -->
-                    <div class="hidden md:block relative">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" placeholder="Hızlı ara..." class="pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-primary-800 border-none text-sm focus:ring-2 focus:ring-accent-500 w-48 transition-all hover:w-64" />
-                    </div>
+                <!-- Notifications -->
+                <button class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-petrol-800 transition-colors relative group">
+                    <i class="fas fa-bell text-xl group-hover:text-accent-500 transition-colors"></i>
+                    <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-petrol-900"></span>
+                </button>
 
-                    <!-- Theme Toggle -->
-                    <button id="theme-toggle" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-primary-800 transition-colors relative overflow-hidden">
-                        <i class="fas fa-sun text-xl absolute transition-transform duration-300 dark:scale-0 dark:rotate-90"></i>
-                        <i class="fas fa-moon text-xl absolute transition-transform duration-300 scale-0 rotate-90 dark:scale-100 dark:rotate-0"></i>
-                    </button>
-
-                    <!-- Notifications -->
-                    <button class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-primary-800 transition-colors relative group">
-                        <i class="fas fa-bell text-xl group-hover:text-accent-500 transition-colors"></i>
-                        <span class="absolute top-2 right-2 w-2.5 h-2.5 bg-accent-500 rounded-full border-2 border-white dark:border-primary-900"></span>
-                    </button>
-
-                    <!-- User Avatar (Mobile visible) -->
-                    <div class="block lg:hidden">
-                        @if (!string.IsNullOrEmpty(user?.ProfilFotografiUrl))
-                        {
-                            <img src="@user.ProfilFotografiUrl" class="w-9 h-9 rounded-full object-cover" />
-                        }
-                        else
-                        {
-                            <div class="w-9 h-9 rounded-full bg-primary-600 text-white flex items-center justify-center text-sm font-bold">
-                                @basHarfler
-                            </div>
-                        }
-                    </div>
-                </div>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-6 lg:p-8 animate-fade-in relative">
-            <!-- Alert Container -->
-            <div id="alert-container"></div>
+        <!-- MAIN CONTENT (Scrollable) -->
+        <main class="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
+            <!-- Fade In Animation Wrapper -->
+            <div class="animate-fade-in max-w-7xl mx-auto">
+                <div id="alert-container"></div>
+                @RenderBody()
+            </div>
 
-            @RenderBody()
+            <!-- Footer inside Main to scroll with content -->
+            <footer class="mt-8 pt-8 border-t border-gray-200 dark:border-petrol-800 text-center text-xs text-gray-500 dark:text-gray-400 pb-6">
+                <p>&copy; @DateTime.Now.Year Yenilikçi Eğitim Platformu. Tüm hakları saklıdır.</p>
+            </footer>
         </main>
 
-        <!-- Footer -->
-        <footer class="p-6 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-primary-800 mt-auto">
-            <p>&copy; @DateTime.Now.Year Yenilikçi Eğitim Platformu. <span class="hidden sm:inline">Tüm hakları saklıdır.</span></p>
-        </footer>
     </div>
 
     <!-- Scripts -->
@@ -375,29 +396,53 @@
             if (isClosed) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10); // Fade effect
             } else {
                 sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300); // Wait for fade out
             }
         }
 
-        // --- Dark Mode Logic (Prompt Uyumlu) ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
+        // --- Dark Mode Logic (Dönen Animasyonlu) ---
+        var themeToggleBtn = document.getElementById('theme-toggle');
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        // Sayfa yüklendiğinde ikon durumunu ayarla
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
 
         themeToggleBtn.addEventListener('click', function() {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (localStorage.getItem('theme')) {
+                if (localStorage.getItem('theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
             } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
             }
         });
 
-        // --- SweetAlert2 Entegrasyonu (AlertService) ---
+        // --- SweetAlert2 Entegrasyonu ---
         @if (TempData["SweetAlert"] != null)
         {
-                @Html.Raw(TempData["SweetAlert"])
+                 @Html.Raw(TempData["SweetAlert"])
         }
     </script>
     @await RenderSectionAsync("Scripts", required: false)

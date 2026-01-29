@@ -12,69 +12,51 @@ namespace YenilikciEgitimPlatformu.Areas.Admin.Pages.Dashboard;
 [Authorize(Roles = "Admin")]
 public class IndexModel : PageModel
 {
-    #region Fields & Constructor
-
     private readonly IDashboardService _dashboardService;
     private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(
-        IDashboardService dashboardService,
-        ILogger<IndexModel> logger)
+    public IndexModel(IDashboardService dashboardService, ILogger<IndexModel> logger)
     {
         _dashboardService = dashboardService;
         _logger = logger;
     }
 
-    #endregion
-
-    #region Properties
-
     public AdminDashboardViewModel Data { get; set; } = new();
-
-    #endregion
-
-    #region Handlers
 
     public async Task OnGetAsync()
     {
         try
         {
+            // Optimize edilmiþ servis çaðrýsý ile verileri çek
             Data = await _dashboardService.GetAdminDashboardDataAsync();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Admin dashboard yüklenirken hata oluþtu");
-            // Hata durumunda boþ model döner, UI'da "Veri yüklenemedi" mesajý gösterilebilir
+            _logger.LogError(ex, "Dashboard yüklenirken kritik hata oluþtu.");
+            // UI tarafýnda null check olduðu için boþ model ile devam edebiliriz, 
+            // kullanýcýya boþ bir dashboard gösterilir ancak sayfa patlamaz.
         }
     }
-
-    #endregion
 }
 
 /*
  * SAYFA AÇIKLAMASI:
  * ==================
  * Bu sayfa Admin kullanýcýlarý için sistem geneli istatistikleri gösterir.
- * 
- * Ýçerik:
+ * * Ýçerik:
  * - Toplam kullanýcý, çaðrý, proje sayýlarý
- * - Bekleyen onay sayýlarý
- * - Aylýk kullanýcý kayýt grafiði (Chart.js Line Chart)
- * - Proje durum daðýlýmý (Chart.js Pie Chart)
- * - En aktif kullanýcýlar tablosu
- * 
- * Yetkilendirme:
- * - Sadece Admin rolündeki kullanýcýlar eriþebilir
- * 
- * Layout:
- * - _LayoutDashboard.cshtml kullanýlýr (Conditional rendering ile Admin sidebar gösterilir)
- * 
- * Servis Kullanýmý:
- * - IDashboardService üzerinden tüm veriler çekilir
- * - Eventual consistency kabul edilir
- * 
- * Chart.js Entegrasyonu:
- * - Layout'ta Chart.js CDN yüklüdür
- * - Scripts section'da chart'lar initialize edilir
- * - Veriler Razor'dan JSON.serialize ile aktarýlýr
+ * - Bekleyen onay sayýlarý (DashboardService üzerinden hesaplanýr)
+ * - Aylýk kullanýcý kayýt grafiði (Chart.js Line Chart verisi)
+ * - Proje durum daðýlýmý (Chart.js Doughnut Chart verisi)
+ * - Son sistem aktiviteleri (AuditLog entegrasyonu ile son 5 iþlem)
+ * * Yetkilendirme:
+ * - Sadece Admin rolündeki kullanýcýlar eriþebilir [Authorize(Roles = "Admin")]
+ * * Layout:
+ * - _LayoutDashboard.cshtml kullanýlýr.
+ * * Servis Kullanýmý:
+ * - IDashboardService üzerinden tüm veriler tek bir ViewModel (AdminDashboardViewModel) içinde çekilir.
+ * - Performans için AsNoTracking() ve Projection (Select) yöntemleri serviste uygulanmýþtýr.
+ * * Hata Yönetimi:
+ * - Try-catch bloðu ile servis hatalarý yakalanýr ve loglanýr (Serilog).
+ * - Kritik hata durumunda sayfa çalýþmaya devam eder (Graceful Degradation).
  */

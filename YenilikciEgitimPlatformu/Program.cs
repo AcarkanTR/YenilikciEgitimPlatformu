@@ -109,6 +109,7 @@ try
 
         #region Email Doğrulama
         // V1'de email doğrulama pasif (2FA için altyapı hazır)
+        options.SignIn.RequireConfirmedAccount = false;
         options.SignIn.RequireConfirmedEmail = false;
         options.SignIn.RequireConfirmedPhoneNumber = false;
         #endregion

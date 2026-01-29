@@ -41,7 +41,7 @@ public static class DbSeeder
             await SeedAdminUserAsync(userManager);
 
             // Admin kullanıcısını bul (FK hatasını önlemek için ID'sini kullanacağız)
-            var adminUser = await userManager.FindByEmailAsync("admin@yep.com");
+            var adminUser = await userManager.FindByEmailAsync("yep@admin.com");
             var adminId = adminUser?.Id ?? "system"; // Bulunamazsa fallback
 
             await SeedIllerAsync(context);
@@ -89,7 +89,7 @@ public static class DbSeeder
 
     private static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager)
     {
-        var adminEmail = "admin@yep.com";
+        var adminEmail = "yep@admin.com";
         var password = "Admin123!";
 
         var admin = await userManager.FindByEmailAsync(adminEmail);
@@ -99,7 +99,7 @@ public static class DbSeeder
             // Kullanıcı yoksa sıfırdan oluştur
             var newAdmin = new ApplicationUser
             {
-                UserName = "admin",
+                UserName = "Yonetici",
                 Email = adminEmail,
                 EmailConfirmed = true, // Giriş için önemli!
                 Ad = "Sistem",

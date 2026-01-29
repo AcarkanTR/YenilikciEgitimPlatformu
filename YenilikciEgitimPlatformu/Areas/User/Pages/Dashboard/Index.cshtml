@@ -1,222 +1,371 @@
 ﻿@page
 @model YenilikciEgitimPlatformu.Areas.User.Pages.Dashboard.IndexModel
 @{
-    ViewData["Title"] = "Dashboard";
-    ViewData["Subtitle"] = $"Hoş geldin, {Model.Data.KullaniciAdi}!";
+    ViewData["Title"] = "Panelim";
     Layout = "~/Pages/Shared/_LayoutDashboard.cshtml";
 }
 
-<!-- Hoş Geldin Kartı -->
-<div class="card-modern p-6 mb-8 bg-gradient-to-br from-petrol-500 to-petrol-600 text-white">
-    <div class="flex items-center justify-between">
-        <div>
-            <h2 class="text-3xl font-bold mb-2">Hoş geldin, @Model.Data.KullaniciAdi! 👋</h2>
-            <p class="text-white/80">İşte senin için hazırladığımız özet</p>
-        </div>
-        @if (!string.IsNullOrEmpty(Model.Data.ProfilFotoUrl))
-        {
-            <img src="@Model.Data.ProfilFotoUrl" alt="@Model.Data.KullaniciAdi" class="w-24 h-24 rounded-full border-4 border-white/20 object-cover" />
-        }
-        else
-        {
-            <div class="w-24 h-24 rounded-full border-4 border-white/20 bg-white/20 flex items-center justify-center">
-                <i class="fas fa-user text-4xl text-white/60"></i>
+@* --- Özel Stiller (Glassmorphism & Pattern) --- *@
+<style>
+    .bg-dot-pattern {
+        background-image: radial-gradient(#94a3b8 1px, transparent 1px);
+        background-size: 24px 24px;
+    }
+    .dark .bg-dot-pattern {
+        background-image: radial-gradient(#334155 1px, transparent 1px);
+    }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    .dark .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+
+    /* Tablo/Liste Hover Efekti */
+    .list-item-hover:hover {
+        background-color: rgba(243, 244, 246, 0.5);
+    }
+    .dark .list-item-hover:hover {
+        background-color: rgba(51, 65, 85, 0.5);
+    }
+</style>
+
+<div class="relative min-h-screen">
+    
+    <!-- Arka Plan -->
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute inset-0 bg-dot-pattern opacity-10 dark:opacity-5"></div>
+        <!-- Sol altta kullanıcı için mavi ambiyans ışığı -->
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full filter blur-[120px]"></div>
+    </div>
+
+    <!-- Full Width Header Section -->
+    <div class="relative z-10 -mx-6 lg:-mx-8 px-6 lg:px-8 py-8 mb-8 bg-gradient-to-r from-white via-gray-50/50 to-white dark:from-petrol-900 dark:via-petrol-900/50 dark:to-petrol-900 border-b border-gray-200 dark:border-petrol-800 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 animate__animated animate__fadeInDown">
+            <div>
+                <h1 class="text-3xl font-black text-petrol-900 dark:text-white tracking-tight flex items-center gap-3">
+                    <span class="w-1.5 h-8 rounded-full bg-blue-500 shadow-lg shadow-blue-500/30"></span>
+                    Hoş Geldin, @Model.Data.KullaniciAdi!
+                </h1>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2 ml-5">
+                    Kişisel istatistiklerin ve proje durumun burada.
+                </p>
             </div>
-        }
-    </div>
-</div>
-
-<!-- İstatistik Kartları -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <!-- Projeler -->
-    <div class="card-modern p-4 text-center hover:shadow-soft-hover transition-shadow">
-        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-petrol-400 to-petrol-600 rounded-full flex items-center justify-center">
-            <i class="fas fa-rocket text-white text-xl"></i>
+            
+            <!-- Kullanıcı Durum Göstergesi -->
+            <div class="flex items-center gap-4">
+                <div class="hidden md:block text-right mr-2">
+                    <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Seviye Puanı</span>
+                    <span class="font-mono text-sm font-bold text-accent-500">@Model.Data.SeviPuani XP</span>
+                </div>
+                
+                <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white dark:bg-petrol-800 border border-gray-100 dark:border-petrol-700 shadow-sm">
+                    @if (!string.IsNullOrEmpty(Model.Data.ProfilFotoUrl))
+                    {
+                        <img src="@Model.Data.ProfilFotoUrl" alt="@Model.Data.KullaniciAdi" class="w-8 h-8 rounded-full object-cover border-2 border-white dark:border-petrol-600 shadow-sm" />
+                    }
+                    else
+                    {
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-petrol-500 to-petrol-700 flex items-center justify-center text-white text-xs font-bold border-2 border-white dark:border-petrol-600 shadow-sm">
+                            @Model.Data.KullaniciAdi.Substring(0, 1).ToUpper()
+                        </div>
+                    }
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-gray-700 dark:text-gray-200 leading-none">Hesap Aktif</span>
+                        <span class="text-[10px] text-green-500 mt-0.5 leading-none flex items-center">
+                            <i class="fas fa-circle text-[6px] mr-1 animate-pulse"></i> Çevrimiçi
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <h3 class="text-2xl font-bold text-petrol-900 dark:text-white">@Model.Data.ToplamProjeSayisi</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400">Toplam Proje</p>
-        <p class="text-xs text-green-600 dark:text-green-400 mt-1">@Model.Data.AktifProjeSayisi aktif</p>
     </div>
 
-    <!-- Gönderiler -->
-    <div class="card-modern p-4 text-center hover:shadow-soft-hover transition-shadow">
-        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
-            <i class="fas fa-comment text-white text-xl"></i>
+    <!-- İçerik Wrapper -->
+    <div class="relative z-10 space-y-8">
+
+        <!-- İstatistik Kartları -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate__animated animate__fadeInUp">
+            
+            <!-- Projeler -->
+            <div class="glass-card p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Projelerim</p>
+                        <h3 class="text-3xl font-black text-petrol-800 dark:text-white mt-2">@Model.Data.ToplamProjeSayisi</h3>
+                        <div class="mt-2 inline-flex items-center text-xs font-medium text-green-600 bg-green-50 dark:bg-green-900/20 px-2.5 py-1 rounded-lg border border-green-100 dark:border-green-900/30">
+                            <i class="fas fa-check-circle mr-1.5"></i> @Model.Data.AktifProjeSayisi aktif
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-petrol-500 to-teal-600 flex items-center justify-center shadow-lg shadow-petrol-500/30 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-rocket text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gönderiler -->
+            <div class="glass-card p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Paylaşımlar</p>
+                        <h3 class="text-3xl font-black text-petrol-800 dark:text-white mt-2">@Model.Data.ToplamGonderiSayisi</h3>
+                        <div class="mt-2 inline-flex items-center text-xs font-medium text-purple-600 bg-purple-50 dark:bg-purple-900/20 px-2.5 py-1 rounded-lg border border-purple-100 dark:border-purple-900/30">
+                            <i class="fas fa-comment-dots mr-1.5"></i> @Model.Data.ToplamYorumSayisi yorum
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-pen-nib text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rozetler -->
+            <div class="glass-card p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Rozetler</p>
+                        <h3 class="text-3xl font-black text-petrol-800 dark:text-white mt-2">@Model.Data.KazanilanRozetSayisi</h3>
+                        <div class="mt-2 inline-flex items-center text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1 rounded-lg border border-amber-100 dark:border-amber-900/30">
+                            <i class="fas fa-medal mr-1.5"></i> Başarı
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform group-hover:rotate-12">
+                        <i class="fas fa-trophy text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- XP Puanı -->
+            <div class="glass-card p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Deneyim (XP)</p>
+                        <h3 class="text-3xl font-black text-petrol-800 dark:text-white mt-2">@Model.Data.SeviPuani</h3>
+                        <div class="mt-2 inline-flex items-center text-xs font-medium text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                            <i class="fas fa-star mr-1.5"></i> Seviye atla
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-bolt text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
         </div>
-        <h3 class="text-2xl font-bold text-petrol-900 dark:text-white">@Model.Data.ToplamGonderiSayisi</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400">Gönderi</p>
-    </div>
 
-    <!-- Rozetler -->
-    <div class="card-modern p-4 text-center hover:shadow-soft-hover transition-shadow">
-        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center">
-            <i class="fas fa-trophy text-white text-xl"></i>
+        <!-- Grafikler -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+            
+            <!-- Bar Chart (Aylık Aktivite) -->
+            <div class="glass-card rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <h3 class="font-bold text-petrol-900 dark:text-white flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                        Aylık Aktivite
+                    </h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="monthlyActivityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Doughnut Chart (Proje Durumları) -->
+            <div class="glass-card rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <h3 class="font-bold text-petrol-900 dark:text-white flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-purple-500 rounded-full"></span>
+                        Proje Durumları
+                    </h3>
+                </div>
+                <div class="chart-container" style="height: 250px;">
+                    <canvas id="projectStatusChart"></canvas>
+                </div>
+            </div>
         </div>
-        <h3 class="text-2xl font-bold text-petrol-900 dark:text-white">@Model.Data.KazanilanRozetSayisi</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400">Rozet</p>
-    </div>
 
-    <!-- Seviye Puanı -->
-    <div class="card-modern p-4 text-center hover:shadow-soft-hover transition-shadow">
-        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-            <i class="fas fa-star text-white text-xl"></i>
-        </div>
-        <h3 class="text-2xl font-bold text-petrol-900 dark:text-white">@Model.Data.SeviPuani</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400">XP Puanı</p>
-    </div>
-</div>
+        <!-- Son Projeler ve Aktiviteler -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
+            
+            <!-- Son Projeler Listesi -->
+            <div class="glass-card rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <h3 class="font-bold text-petrol-900 dark:text-white flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-teal-500 rounded-full"></span>
+                        Son Projelerim
+                    </h3>
+                    <a asp-area="User" asp-page="/Projeler/Index" class="text-xs font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1 transition-colors">
+                        Tümünü Gör <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
 
-<!-- Grafikler ve Projeler -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <!-- Aylık Aktivite -->
-    <div class="card-modern p-6">
-        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
-            <i class="fas fa-chart-bar mr-2 text-petrol-600"></i>
-            Aylık Aktiviten
-        </h3>
-        <canvas id="monthlyActivityChart"></canvas>
-    </div>
-
-    <!-- Proje Durum Dağılımı -->
-    <div class="card-modern p-6">
-        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
-            <i class="fas fa-chart-pie mr-2 text-purple-600"></i>
-            Proje Durumları
-        </h3>
-        <canvas id="projectStatusChart"></canvas>
-    </div>
-</div>
-
-<!-- Son Projeler ve Aktiviteler -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Son Projeler -->
-    <div class="card-modern p-6">
-        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center justify-between">
-            <span>
-                <i class="fas fa-rocket mr-2 text-petrol-600"></i>
-                Son Projelerim
-            </span>
-            <a asp-area="User" asp-page="/Projeler/Index" class="text-sm text-petrol-600 dark:text-petrol-400 hover:underline">
-                Tümünü Gör →
-            </a>
-        </h3>
-
-        @if (Model.Data.SonProjeler.Any())
-        {
-            <div class="space-y-3">
-                @foreach (var proje in Model.Data.SonProjeler)
+                @if (Model.Data.SonProjeler.Any())
                 {
-                    <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-petrol-800/50 transition-colors">
-                        @if (!string.IsNullOrEmpty(proje.KapakResmiUrl))
+                    <div class="space-y-3">
+                        @foreach (var proje in Model.Data.SonProjeler)
                         {
-                            <img src="@proje.KapakResmiUrl" alt="@proje.Baslik" class="w-16 h-16 rounded-lg object-cover" />
-                        }
-                        else
-                        {
-                            <div class="w-16 h-16 bg-gradient-to-br from-petrol-400 to-petrol-600 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-rocket text-white text-xl"></i>
-                            </div>
-                        }
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 dark:text-white truncate">@proje.Baslik</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">@proje.Durum</p>
-                            <div class="mt-1">
-                                <div class="w-full bg-gray-200 dark:bg-petrol-700 rounded-full h-2">
-                                    <div class="bg-gradient-to-r from-petrol-500 to-petrol-600 h-2 rounded-full" style="width: @proje.IlerlemeYuzdesi%"></div>
+                            <div class="flex items-center space-x-4 p-3 rounded-2xl list-item-hover transition-colors border border-transparent hover:border-gray-100 dark:hover:border-petrol-700">
+                                @if (!string.IsNullOrEmpty(proje.KapakResmiUrl))
+                                {
+                                    <img src="@proje.KapakResmiUrl" alt="@proje.Baslik" class="w-12 h-12 rounded-xl object-cover shadow-sm" />
+                                }
+                                else
+                                {
+                                    <div class="w-12 h-12 bg-gradient-to-br from-petrol-100 to-petrol-200 dark:from-petrol-800 dark:to-petrol-700 rounded-xl flex items-center justify-center text-petrol-600 dark:text-petrol-400">
+                                        <i class="fas fa-rocket text-lg"></i>
+                                    </div>
+                                }
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-bold text-gray-800 dark:text-gray-100 truncate text-sm">@proje.Baslik</h4>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-[10px] px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-medium">@proje.Durum</span>
+                                        <span class="text-[10px] text-gray-400">@proje.OlusturmaTarihi.ToString("dd.MM.yyyy")</span>
+                                    </div>
                                 </div>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">%@proje.IlerlemeYuzdesi</span>
+                                <div class="text-right">
+                                    <div class="relative w-10 h-10 flex items-center justify-center">
+                                         <svg class="transform -rotate-90 w-10 h-10">
+                                            <circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="3" fill="transparent" class="text-gray-200 dark:text-gray-700" />
+                                            <circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="3" fill="transparent" stroke-dasharray="100" stroke-dashoffset="@(100 - proje.IlerlemeYuzdesi)" class="text-teal-500" />
+                                        </svg>
+                                        <span class="absolute text-[9px] font-bold text-teal-600 dark:text-teal-400">%@proje.IlerlemeYuzdesi</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 }
-            </div>
-        }
-        else
-        {
-            <div class="text-center py-8">
-                <i class="fas fa-rocket text-6xl text-gray-300 dark:text-gray-700 mb-4"></i>
-                <p class="text-gray-500 dark:text-gray-400">Henüz proje oluşturmadın</p>
-                <a asp-area="User" asp-page="/Projeler/Olustur" class="inline-block mt-4 px-4 py-2 bg-gradient-to-r from-petrol-500 to-petrol-600 text-white rounded-lg hover:from-petrol-600 hover:to-petrol-700 transition-colors">
-                    İlk Projeyi Oluştur
-                </a>
-            </div>
-        }
-    </div>
-
-    <!-- Son Aktiviteler -->
-    <div class="card-modern p-6">
-        <h3 class="text-lg font-bold text-petrol-900 dark:text-white mb-4 flex items-center">
-            <i class="fas fa-history mr-2 text-amber-600"></i>
-            Son Aktiviteler
-        </h3>
-
-        @if (Model.Data.SonAktiviteler.Any())
-        {
-            <div class="space-y-3">
-                @foreach (var aktivite in Model.Data.SonAktiviteler)
+                else
                 {
-                    <div class="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-petrol-800/50 transition-colors">
-                        <div class="w-10 h-10 bg-gradient-to-br from-petrol-100 to-petrol-200 dark:from-petrol-700 dark:to-petrol-800 rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="@aktivite.Ikon text-petrol-600 dark:text-petrol-400"></i>
+                    <div class="flex flex-col items-center justify-center py-10 text-center">
+                        <div class="w-16 h-16 bg-gray-50 dark:bg-petrol-800/50 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-rocket text-2xl text-gray-300 dark:text-gray-600"></i>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900 dark:text-white">@aktivite.Tip</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 truncate">@aktivite.Aciklama</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                                @aktivite.Tarih.ToString("dd MMM yyyy, HH:mm")
-                            </p>
-                        </div>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">Henüz bir projeniz yok.</p>
+                        <a asp-area="User" asp-page="/Projeler/Olustur" class="px-4 py-2 bg-petrol-600 hover:bg-petrol-700 text-white rounded-xl text-xs font-bold transition-colors">
+                            <i class="fas fa-plus mr-1"></i> İlk Projeyi Oluştur
+                        </a>
                     </div>
                 }
             </div>
-        }
-        else
-        {
-            <div class="text-center py-8">
-                <i class="fas fa-history text-6xl text-gray-300 dark:text-gray-700 mb-4"></i>
-                <p class="text-gray-500 dark:text-gray-400">Henüz aktivite yok</p>
+
+            <!-- Son Aktiviteler -->
+            <div class="glass-card rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <h3 class="font-bold text-petrol-900 dark:text-white flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-amber-500 rounded-full"></span>
+                        Zaman Çizelgesi
+                    </h3>
+                </div>
+
+                @if (Model.Data.SonAktiviteler.Any())
+                {
+                    <div class="space-y-4 pl-2">
+                        @foreach (var aktivite in Model.Data.SonAktiviteler)
+                        {
+                            <div class="relative flex gap-4 group">
+                                <!-- Timeline Line -->
+                                <div class="absolute left-[19px] top-8 bottom-[-16px] w-0.5 bg-gray-100 dark:bg-gray-800 group-last:hidden"></div>
+                                
+                                <div class="w-10 h-10 rounded-full bg-white dark:bg-petrol-800 border-2 border-gray-100 dark:border-petrol-700 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:border-amber-200 dark:group-hover:border-amber-900 transition-colors z-10">
+                                    <i class="@aktivite.Ikon text-gray-400 dark:text-gray-500 group-hover:text-amber-500 transition-colors text-sm"></i>
+                                </div>
+                                <div class="flex-1 pt-1 pb-1">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="text-sm font-bold text-gray-800 dark:text-gray-100">@aktivite.Tip</h4>
+                                        <span class="text-[10px] text-gray-400 bg-gray-50 dark:bg-petrol-800 px-1.5 py-0.5 rounded border border-gray-100 dark:border-petrol-700">
+                                            @aktivite.Tarih.ToString("dd.MM HH:mm")
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                                        @aktivite.Aciklama
+                                    </p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="flex flex-col items-center justify-center py-10 text-center">
+                        <i class="fas fa-history text-2xl text-gray-300 dark:text-gray-600 mb-2"></i>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">Henüz bir aktivite kaydı yok.</p>
+                    </div>
+                }
             </div>
-        }
+        </div>
+
     </div>
 </div>
 
 @section Scripts {
     <script>
-        // Aylık Aktivite Bar Chart
+        // --- Grafik Konfigürasyonları (Dark Mode Destekli) ---
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#94a3b8' : '#64748b';
+        const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+        // 1. Aylık Aktivite Bar Chart
         const monthlyActivityCtx = document.getElementById('monthlyActivityChart').getContext('2d');
+        
+        // Gradient for bars
+        let barGradient = monthlyActivityCtx.createLinearGradient(0, 0, 0, 300);
+        barGradient.addColorStop(0, '#3b82f6'); // Blue-500
+        barGradient.addColorStop(1, '#60a5fa'); // Blue-400
+
         new Chart(monthlyActivityCtx, {
             type: 'bar',
             data: {
                 labels: @Html.Raw(Json.Serialize(Model.Data.AylikAktivite.Select(a => a.Ay))),
                 datasets: [{
-                    label: 'Aktivite Sayısı',
+                    label: 'Aktivite',
                     data: @Html.Raw(Json.Serialize(Model.Data.AylikAktivite.Select(a => a.Deger))),
-                    backgroundColor: 'rgba(20, 184, 166, 0.8)',
-                    borderColor: 'rgb(20, 184, 166)',
-                    borderWidth: 1,
-                    borderRadius: 8
+                    backgroundColor: barGradient,
+                    borderRadius: 6,
+                    barThickness: 20,
+                    hoverBackgroundColor: '#2563eb'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                        titleColor: isDark ? '#f1f5f9' : '#0f172a',
+                        bodyColor: isDark ? '#cbd5e1' : '#334155',
+                        borderColor: isDark ? '#334155' : '#e2e8f0',
+                        borderWidth: 1,
+                        displayColors: false,
+                        cornerRadius: 8,
+                        padding: 10
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
+                        grid: { color: gridColor, borderDash: [4, 4] },
+                        ticks: { color: textColor, precision: 0 }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: textColor }
                     }
                 }
             }
         });
 
-        // Proje Durum Dağılımı
+        // 2. Proje Durum Dağılımı Doughnut Chart
         const projectStatusCtx = document.getElementById('projectStatusChart').getContext('2d');
         new Chart(projectStatusCtx, {
             type: 'doughnut',
@@ -226,18 +375,22 @@
                     data: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Sayi))),
                     backgroundColor: @Html.Raw(Json.Serialize(Model.Data.ProjeDurumDagilimi.Select(d => d.Renk))),
                     borderWidth: 2,
-                    borderColor: '#fff'
+                    borderColor: isDark ? '#1e293b' : '#ffffff',
+                    hoverOffset: 4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutout: '70%',
                 plugins: {
                     legend: {
-                        position: 'bottom',
+                        position: 'right',
                         labels: {
-                            boxWidth: 12,
-                            padding: 10
+                            color: textColor,
+                            usePointStyle: true,
+                            font: { family: "'Inter', sans-serif", size: 11 },
+                            padding: 15
                         }
                     }
                 }
