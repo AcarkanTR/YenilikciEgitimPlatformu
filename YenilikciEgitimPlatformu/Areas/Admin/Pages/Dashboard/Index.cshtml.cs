@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+ï»¿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using YenilikciEgitimPlatformu.Services.Interfaces;
 using YenilikciEgitimPlatformu.ViewModels.Dashboard;
@@ -6,7 +6,7 @@ using YenilikciEgitimPlatformu.ViewModels.Dashboard;
 namespace YenilikciEgitimPlatformu.Areas.Admin.Pages.Dashboard;
 
 /// <summary>
-/// Admin Dashboard ana sayfası PageModel
+/// Admin Dashboard ana sayfasÄ± PageModel
 /// Sistem geneli istatistikler ve grafikler
 /// </summary>
 [Authorize(Roles = "Admin")]
@@ -27,36 +27,36 @@ public class IndexModel : PageModel
     {
         try
         {
-            // Optimize edilmiş servis çağrısı ile verileri çek
+            // Optimize edilmiÅŸ servis Ã§aÄŸrÄ±sÄ± ile verileri Ã§ek
             Data = await _dashboardService.GetAdminDashboardDataAsync();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Dashboard yüklenirken kritik hata oluştu.");
-            // UI tarafında null check olduğu için boş model ile devam edebiliriz, 
-            // kullanıcıya boş bir dashboard gösterilir ancak sayfa patlamaz.
+            _logger.LogError(ex, "Dashboard yÃ¼klenirken kritik hata oluÅŸtu.");
+            // UI tarafÄ±nda null check olduÄŸu iÃ§in boÅŸ model ile devam edebiliriz, 
+            // kullanÄ±cÄ±ya boÅŸ bir dashboard gÃ¶sterilir ancak sayfa patlamaz.
         }
     }
 }
 
 /*
- * SAYFA AÇIKLAMASI:
+ * SAYFA AÃ‡IKLAMASI:
  * ==================
- * Bu sayfa Admin kullanıcıları için sistem geneli istatistikleri gösterir.
- * * İçerik:
- * - Toplam kullanıcı, çağrı, proje sayıları
- * - Bekleyen onay sayıları (DashboardService üzerinden hesaplanır)
- * - Aylık kullanıcı kayıt grafiği (Chart.js Line Chart verisi)
- * - Proje durum dağılımı (Chart.js Doughnut Chart verisi)
- * - Son sistem aktiviteleri (AuditLog entegrasyonu ile son 5 işlem)
+ * Bu sayfa Admin kullanÄ±cÄ±larÄ± iÃ§in sistem geneli istatistikleri gÃ¶sterir.
+ * * Ä°Ã§erik:
+ * - Toplam kullanÄ±cÄ±, Ã§aÄŸrÄ±, proje sayÄ±larÄ±
+ * - Bekleyen onay sayÄ±larÄ± (DashboardService Ã¼zerinden hesaplanÄ±r)
+ * - AylÄ±k kullanÄ±cÄ± kayÄ±t grafiÄŸi (Chart.js Line Chart verisi)
+ * - Proje durum daÄŸÄ±lÄ±mÄ± (Chart.js Doughnut Chart verisi)
+ * - Son sistem aktiviteleri (AuditLog entegrasyonu ile son 5 iÅŸlem)
  * * Yetkilendirme:
- * - Sadece Admin rolündeki kullanıcılar erişebilir [Authorize(Roles = "Admin")]
+ * - Sadece Admin rolÃ¼ndeki kullanÄ±cÄ±lar eriÅŸebilir [Authorize(Roles = "Admin")]
  * * Layout:
- * - _LayoutDashboard.cshtml kullanılır.
- * * Servis Kullanımı:
- * - IDashboardService üzerinden tüm veriler tek bir ViewModel (AdminDashboardViewModel) içinde çekilir.
- * - Performans için AsNoTracking() ve Projection (Select) yöntemleri serviste uygulanmıştır.
- * * Hata Yönetimi:
- * - Try-catch bloğu ile servis hataları yakalanır ve loglanır (Serilog).
- * - Kritik hata durumunda sayfa çalışmaya devam eder (Graceful Degradation).
+ * - _LayoutDashboard.cshtml kullanÄ±lÄ±r.
+ * * Servis KullanÄ±mÄ±:
+ * - IDashboardService Ã¼zerinden tÃ¼m veriler tek bir ViewModel (AdminDashboardViewModel) iÃ§inde Ã§ekilir.
+ * - Performans iÃ§in AsNoTracking() ve Projection (Select) yÃ¶ntemleri serviste uygulanmÄ±ÅŸtÄ±r.
+ * * Hata YÃ¶netimi:
+ * - Try-catch bloÄŸu ile servis hatalarÄ± yakalanÄ±r ve loglanÄ±r (Serilog).
+ * - Kritik hata durumunda sayfa Ã§alÄ±ÅŸmaya devam eder (Graceful Degradation).
  */
