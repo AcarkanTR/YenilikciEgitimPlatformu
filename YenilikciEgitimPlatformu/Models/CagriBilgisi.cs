@@ -8,12 +8,10 @@ namespace YenilikciEgitimPlatformu.Models;
  * ════════════════════════════════════════════════════════════════════════════
  * SİSTEM 1: ÇAĞRI BİLGİ SİSTEMİ
  * ════════════════════════════════════════════════════════════════════════════
- * 
- * Amaç: Resmi kurum çağrılarının (proje/yarışma/etkinlik) tek merkezden yayınlanması
+ * * Amaç: Resmi kurum çağrılarının (proje/yarışma/etkinlik) tek merkezden yayınlanması
  * Yönetici: Admin/Moderatör
  * Kullanıcı Etkileşimi: Takip, Katılım Bildirimi, Bildirim
- * 
- * Örnekler:
+ * * Örnekler:
  * - TÜBİTAK 2204-A Ortaöğretim Öğrencileri Araştırma Projeleri Yarışması
  * - MEB Fen Bilimleri Proje Yarışması
  * - TEKNOFEST Roket Yarışması
@@ -163,22 +161,22 @@ public class CagriBilgisi : BaseEntity
     /// <summary>
     /// Görüntülenme sayısı
     /// </summary>
-    public int GoruntulenmeSayisi { get; set; } // Veya null olabilirse: int?
+    public int GoruntulenmeSayisi { get; set; } = 0;
 
     /// <summary>
-    /// Başvuru linki
+    /// Başvuru linki (DB hatası almamak için boş string ile başlatıldı)
     /// </summary>
-    public string BasvuruLinki { get; set; }
+    public string BasvuruLinki { get; set; } = string.Empty;
 
     /// <summary>
-    /// Düzenlenen kurum logosu URL
+    /// Düzenlenen kurum logosu URL (DB hatası almamak için boş string ile başlatıldı)
     /// </summary>
-    public string DuzenlenenKurumLogoUrl { get; set; }
+    public string DuzenlenenKurumLogoUrl { get; set; } = string.Empty;
 
     /// <summary>
-    /// Düzenlenen kurum
+    /// Düzenlenen kurum (DB hatası almamak için boş string ile başlatıldı)
     /// </summary>
-    public string DuzenlenenKurum { get; set; }
+    public string DuzenlenenKurum { get; set; } = string.Empty;
 
     #endregion
 
