@@ -7,21 +7,29 @@
 }
 
 @* ════════════════════════════════════════════════════════════════════════════
-   MODERN GLASSMORPHISM DASHBOARD LİSTE (INDEX SAYFASI)
+   MODERN GLASSMORPHISM DASHBOARD LİSTE SAYFASI
    ════════════════════════════════════════════════════════════════════════════
+   
+   [ÖZELLİKLER]
    - Responsive Grid Layout
    - Glassmorphism Cards
    - Advanced Filtering
    - Pagination with Query String Preservation
    - AlertService Integration (No inline Swal!)
    - Accessibility Compliant
+   - Dark Mode Support
+   
+   [BAĞIMLILIKLAR]
+   - AlertService.js (Merkezi feedback sistemi)
+   - _LayoutDashboard.cshtml (Layout)
+   - Tailwind CSS
+   - Font Awesome 6.4
 *@
 
+@* ════════════════════════════════════════════════════════════════════════════
+   CUSTOM STYLES
+   ════════════════════════════════════════════════════════════════════════════ *@
 <style>
-    /* ═══════════════════════════════════════════════════════════════════
-           CUSTOM STYLES - Glassmorphism & Card Enhancements
-           ═══════════════════════════════════════════════════════════════ */
-
     .bg-dot-pattern {
         background-image: radial-gradient(#94a3b8 1px, transparent 1px);
         background-size: 24px 24px;
@@ -47,12 +55,11 @@
 @* ════════════════════════════════════════════════════════════════════════════
    MAIN CONTENT WRAPPER
    ════════════════════════════════════════════════════════════════════════════ *@
-
 <div class="relative min-h-screen pb-12">
 
-    @* ═══════════════════════════════════════════════════════════════════
-       FULL WIDTH HEADER
-       ═══════════════════════════════════════════════════════════════ *@
+    @* ─────────────────────────────────────────────────────────────────
+       HEADER SECTION
+       ───────────────────────────────────────────────────────────────── *@
     <div class="relative z-10 -mx-6 lg:-mx-8 px-6 lg:px-8 py-8 mb-8 bg-gradient-to-r from-white via-gray-50/50 to-white dark:from-petrol-900 dark:via-petrol-900/50 dark:to-petrol-900 border-b border-gray-200 dark:border-petrol-800 shadow-sm">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 animate__animated animate__fadeInDown">
             <div>
@@ -81,21 +88,24 @@
         </div>
     </div>
 
-    @* ═══════════════════════════════════════════════════════════════════
+    @* ─────────────────────────────────────────────────────────────────
        CONTENT WRAPPER
-       ═══════════════════════════════════════════════════════════════ *@
+       ───────────────────────────────────────────────────────────────── *@
     <div class="relative z-10 space-y-6 max-w-7xl mx-auto px-0">
 
-        @* ═══════════════════════════════════════════════════════════════════
-           FILTER AREA (Gelişmiş Filtreleme - Floating Labels)
-           ═══════════════════════════════════════════════════════════════ *@
+        @* ─────────────────────────────────────────────────────────────────
+           FILTER AREA (Gelişmiş Filtreleme)
+           ───────────────────────────────────────────────────────────────── *@
         <div class="glass-card rounded-2xl p-6 shadow-sm animate__animated animate__fadeInUp">
             <form method="get" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end" id="filterForm">
 
                 @* Arama (Floating Label) *@
                 <div class="md:col-span-4 relative group">
-                    <input type="text" name="Filtre.Arama" value="@Model.Filtre.Arama" id="filter_search"
-                           class="block px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50/50 dark:bg-petrol-900/30 rounded-xl border border-gray-200 dark:border-petrol-600 appearance-none dark:text-white focus:outline-none focus:ring-0 focus:border-accent-500 peer pl-10"
+                    <input type="text"
+                           name="Filtre.Arama"
+                           value="@Model.Filtre.Arama"
+                           id="filter_search"
+                           class="block px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 dark:text-white bg-gray-50/50 dark:bg-petrol-900/30 rounded-xl border border-gray-200 dark:border-petrol-600 appearance-none focus:outline-none focus:ring-0 focus:border-accent-500 peer pl-10"
                            placeholder=" "
                            aria-label="Başlık veya Açıklama Ara" />
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -106,10 +116,13 @@
                     </label>
                 </div>
 
-                @* Tür Filtresi (Floating Label) *@
+                @* Tür Filtresi (Floating Label) - DÜZELTİLDİ *@
                 <div class="md:col-span-3 relative group">
-                    <select name="Filtre.Turu" id="filter_type" asp-items="Html.GetEnumSelectList<YenilikciEgitimPlatformu.Models.CagriTuru>()"
-                            class="block px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50/50 dark:bg-petrol-900/30 rounded-xl border border-gray-200 dark:border-petrol-600 appearance-none dark:text-white focus:outline-none focus:ring-0 focus:border-accent-500 peer pl-10"
+                    <select name="Filtre.Turu"
+                            id="filter_type"
+                            asp-for="Filtre.Turu"
+                            asp-items="Html.GetEnumSelectList<YenilikciEgitimPlatformu.Models.CagriTuru>()"
+                            class="block px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 dark:text-white bg-gray-50/50 dark:bg-petrol-900/30 rounded-xl border border-gray-200 dark:border-petrol-600 appearance-none focus:outline-none focus:ring-0 focus:border-accent-500 peer pl-10"
                             aria-label="Çağrı Türü Filtresi">
                         <option value="">Tüm Türler</option>
                     </select>
@@ -126,8 +139,11 @@
 
                 @* Kurum Filtresi (Floating Label) *@
                 <div class="md:col-span-3 relative group">
-                    <input type="text" name="Filtre.Kurum" value="@Model.Filtre.Kurum" id="filter_org"
-                           class="block px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50/50 dark:bg-petrol-900/30 rounded-xl border border-gray-200 dark:border-petrol-600 appearance-none dark:text-white focus:outline-none focus:ring-0 focus:border-accent-500 peer pl-10"
+                    <input type="text"
+                           name="Filtre.Kurum"
+                           value="@Model.Filtre.Kurum"
+                           id="filter_org"
+                           class="block px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 dark:text-white bg-gray-50/50 dark:bg-petrol-900/30 rounded-xl border border-gray-200 dark:border-petrol-600 appearance-none focus:outline-none focus:ring-0 focus:border-accent-500 peer pl-10"
                            placeholder=" "
                            aria-label="Kurum Filtresi" />
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -140,167 +156,166 @@
 
                 @* Action Buttons *@
                 <div class="md:col-span-2 flex gap-2">
-                    <button type="submit" class="flex-1 h-[46px] bg-accent-500 hover:bg-accent-600 text-white rounded-xl transition-colors shadow-md shadow-accent-500/20 flex items-center justify-center gap-2" aria-label="Filtrele">
-                        <i class="fas fa-filter"></i> <span class="hidden md:inline">Ara</span>
+                    <button type="submit"
+                            class="flex-1 h-[46px] bg-accent-500 hover:bg-accent-600 text-white rounded-xl transition-colors shadow-md shadow-accent-500/20 flex items-center justify-center gap-2"
+                            aria-label="Filtrele">
+                        <i class="fas fa-filter"></i>
+                        <span class="hidden md:inline">Ara</span>
                     </button>
-                    <a asp-page="./Index" class="h-[46px] w-[46px] flex items-center justify-center bg-gray-100 dark:bg-petrol-700 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-petrol-600 transition-colors" title="Filtreleri Temizle" aria-label="Filtreleri Temizle">
-                        <i class="fas fa-redo-alt"></i>
+                    <a asp-page="./Index"
+                       class="h-[46px] w-[46px] flex items-center justify-center bg-gray-100 dark:bg-petrol-700 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-petrol-600 transition-colors"
+                       title="Filtreleri Temizle"
+                       aria-label="Filtreleri Temizle">
+                        <i class="fas fa-redo"></i>
                     </a>
                 </div>
+
             </form>
         </div>
 
-        @* ═══════════════════════════════════════════════════════════════════
-           LIST AREA (Card Grid Layout)
-           ═══════════════════════════════════════════════════════════════ *@
-        @if (Model.Data.Any())
+        @* ─────────────────────────────────────────────────────────────────
+           DATA GRID / CARDS
+           ───────────────────────────────────────────────────────────────── *@
+        @if (Model.TotalCount > 0)
         {
-            <div class="grid grid-cols-1 gap-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate__animated animate__fadeInUp">
                 @foreach (var cagri in Model.Data)
                 {
-                    <div class="group glass-card rounded-2xl p-4 hover:border-accent-500/30 hover:shadow-lg hover:shadow-accent-500/5 transition-all duration-300 relative overflow-hidden">
+                    <div class="glass-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        @* Card Header *@
+                        <div class="relative h-32 bg-gradient-to-br from-petrol-500 to-petrol-700 overflow-hidden">
+                            <div class="absolute inset-0 opacity-20 bg-dot-pattern"></div>
+                            <div class="absolute top-3 right-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold text-white bg-white/20 backdrop-blur-sm border border-white/30">
+                                    @cagri.Turu.ToString()
+                                </span>
+                            </div>
+                            <div class="absolute bottom-3 left-4 right-4">
+                                <h3 class="text-lg font-bold text-white line-clamp-2 group-hover:line-clamp-none transition-all">
+                                    @cagri.Baslik
+                                </h3>
+                            </div>
+                        </div>
 
-                        @* Hover Accent Line *@
-                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-accent-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-
-                        <div class="flex flex-col md:flex-row gap-5">
-                            @* Görsel / İkon Alanı *@
-                            <div class="shrink-0 relative">
-                                @if (!string.IsNullOrEmpty(cagri.KapakResmiUrl))
-                                {
-                                    <img src="@cagri.KapakResmiUrl" alt="@cagri.Baslik" class="w-full md:w-36 h-36 object-cover rounded-xl shadow-sm group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                                }
-                                else
-                                {
-                                    <div class="w-full md:w-36 h-36 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-petrol-800 dark:to-petrol-900 rounded-xl flex flex-col items-center justify-center border border-dashed border-gray-200 dark:border-petrol-700 group-hover:border-accent-500/30 transition-colors">
-                                        <i class="fas fa-image text-3xl text-gray-300 dark:text-petrol-600 mb-2"></i>
-                                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Görsel Yok</span>
-                                    </div>
-                                }
-
-                                @* Tür Badge (Resim Üzerinde) *@
-                                <div class="absolute top-2 left-2">
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-white/90 dark:bg-black/80 backdrop-blur-sm text-petrol-700 dark:text-petrol-300 shadow-sm border border-white/20">
-                                        @cagri.TuruText
-                                    </span>
-                                </div>
+                        @* Card Body *@
+                        <div class="p-5 space-y-3">
+                            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                                <i class="fas fa-building w-4 mr-2"></i>
+                                <span class="truncate">@cagri.Kurum</span>
                             </div>
 
-                            @* İçerik Alanı *@
-                            <div class="flex-1 flex flex-col justify-between py-1">
-                                <div>
-                                    <div class="flex items-start justify-between gap-3">
-                                        <div>
-                                            <h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-accent-500 transition-colors line-clamp-1">
-                                                @cagri.Baslik
-                                            </h3>
-                                            <p class="text-sm font-medium text-petrol-600 dark:text-petrol-400 mb-2 flex items-center gap-1">
-                                                <i class="fas fa-building opacity-70"></i> @cagri.Kurum
-                                            </p>
-                                        </div>
-
-                                        @* Durum Badge *@
-                                        @if (cagri.Aktif)
-                                        {
-                                            <span class="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5 animate-pulse"></span>
-                                                Aktif
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
-                                                <i class="fas fa-pause-circle mr-1.5"></i> Pasif
-                                            </span>
-                                        }
-                                    </div>
-
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-2 leading-relaxed">
-                                        @cagri.KisaAciklama
-                                    </p>
+                            <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar-check w-4 mr-1.5"></i>
+                                    @cagri.BaslangicTarihi?.ToString("dd.MM.yyyy")
                                 </div>
-
-                                @* Alt Bilgi ve Butonlar *@
-                                <div class="flex flex-wrap items-center justify-between mt-4 border-t border-gray-100 dark:border-petrol-700/50 pt-3 gap-4">
-
-                                    @* Meta Bilgiler *@
-                                    <div class="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
-                                        <span class="flex items-center gap-1.5 bg-gray-50 dark:bg-petrol-800 px-2 py-1 rounded-lg">
-                                            <i class="fas fa-calendar text-accent-500"></i>
-                                            Bitiş: @(cagri.BitisTarihi.HasValue? cagri.BitisTarihi.Value.ToString("dd MMM yyyy", new System.Globalization.CultureInfo("tr-TR")) : "Belirtilmedi")
-                                        </span>
-                                        <span class="flex items-center gap-1.5" title="Görüntülenme">
-                                            <i class="fas fa-eye text-petrol-400"></i> @cagri.GoruntulenmeSayisi
-                                        </span>
-                                        <span class="flex items-center gap-1.5" title="Takipçi">
-                                            <i class="fas fa-users text-petrol-400"></i> @cagri.TakipciSayisi
-                                        </span>
+                                @if (cagri.BitisTarihi.HasValue)
+                                {
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar-times w-4 mr-1.5"></i>
+                                        @cagri.BitisTarihi?.ToString("dd.MM.yyyy")
                                     </div>
-
-                                    @* Action Buttons *@
-                                    <div class="flex items-center gap-2">
-                                        <a asp-page="/CagriBilgileri/Detay" asp-route-slug="@cagri.Slug" target="_blank" class="p-2 text-gray-400 hover:text-petrol-600 dark:hover:text-petrol-300 hover:bg-petrol-50 dark:hover:bg-petrol-800 rounded-lg transition-colors" title="Sitede Gör" aria-label="Sitede Gör">
-                                            <i class="fas fa-external-link-alt"></i>
-                                        </a>
-                                        <a asp-page="./Duzenle" asp-route-id="@cagri.Id" class="p-2 text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors" title="Düzenle" aria-label="Düzenle">
-                                            <i class="fas fa-pen"></i>
-                                        </a>
-                                        <button type="button" onclick="handleDelete(@cagri.Id, '@Html.Raw(cagri.Baslik.Replace("'", "\\'"))')" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Sil" aria-label="Sil">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                                }
                             </div>
+
+                            @if (!string.IsNullOrEmpty(cagri.KisaAciklama))
+                            {
+                                <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                                    @cagri.KisaAciklama
+                                </p>
+                            }
+                        </div>
+
+                        @* Card Footer *@
+                        <div class="px-5 pb-5 flex gap-2">
+                            <a asp-page="./Detay" asp-route-id="@cagri.Id"
+                               class="flex-1 py-2.5 text-center text-sm font-semibold text-petrol-700 dark:text-petrol-300 bg-petrol-50 dark:bg-petrol-900/30 rounded-xl hover:bg-petrol-100 dark:hover:bg-petrol-800 transition-colors"
+                               aria-label="Görüntüle">
+                                <i class="fas fa-eye mr-1"></i> Görüntüle
+                            </a>
+                            <a asp-page="./Duzenle" asp-route-id="@cagri.Id"
+                               class="flex-1 py-2.5 text-center text-sm font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+                               aria-label="Düzenle">
+                                <i class="fas fa-edit mr-1"></i> Düzenle
+                            </a>
+                            <button type="button"
+                                    onclick="handleDelete(@cagri.Id, '@Html.Raw(cagri.Baslik.Replace("'", "\\'"))')"
+                                    class="flex-1 py-2.5 text-center text-sm font-semibold text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                                    aria-label="Sil">
+                                <i class="fas fa-trash mr-1"></i> Sil
+                            </button>
                         </div>
                     </div>
                 }
             </div>
 
-            @* ═══════════════════════════════════════════════════════════════════
-               PAGINATION (Filtre Query String Korumalı)
-               ═══════════════════════════════════════════════════════════════ *@
-            @if (Model.TotalCount > Model.Filtre.PageSize)
+            @* ─────────────────────────────────────────────────────────────────
+               PAGINATION (Query String Preserved)
+               ───────────────────────────────────────────────────────────────── *@
+            @if (Model.GetTotalPages() > 1)
             {
-                <div class="flex justify-center mt-8 animate__animated animate__fadeInUp">
-                    <nav class="inline-flex rounded-xl shadow-sm bg-white dark:bg-petrol-900 p-1.5 border border-gray-100 dark:border-petrol-800 gap-1" aria-label="Sayfalama">
-                        @if (Model.Filtre.Page > 1)
-                        {
-                            <a asp-page="./Index"
-                               asp-route-page="@(Model.Filtre.Page - 1)"
-                               asp-route-arama="@Model.Filtre.Arama"
-                               asp-route-turu="@Model.Filtre.Turu"
-                               asp-route-kurum="@Model.Filtre.Kurum"
-                               class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-petrol-800 rounded-lg transition-colors"
-                               aria-label="Önceki Sayfa">
-                                <i class="fas fa-chevron-left mr-1"></i> Önceki
-                            </a>
-                        }
+                <div class="glass-card rounded-2xl p-6 mt-8 animate__animated animate__fadeInUp">
+                    <nav class="flex flex-col md:flex-row items-center justify-between gap-4" aria-label="Pagination">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Sayfa <strong>@Model.Filtre.Page</strong> / <strong>@Model.GetTotalPages()</strong>
+                        </p>
 
-                        <span class="px-4 py-2 text-sm font-bold text-accent-600 dark:text-accent-400 bg-accent-50 dark:bg-accent-900/20 rounded-lg border border-accent-100 dark:border-accent-900/30" aria-current="page">
-                            Sayfa @Model.Filtre.Page / @Model.GetTotalPages()
-                        </span>
+                        <div class="flex gap-2">
+                            @if (Model.Filtre.Page > 1)
+                            {
+                                <a asp-page="./Index"
+                                   asp-route-Filtre.Page="@(Model.Filtre.Page - 1)"
+                                   asp-route-Filtre.Arama="@Model.Filtre.Arama"
+                                   asp-route-Filtre.Turu="@Model.Filtre.Turu"
+                                   asp-route-Filtre.Kurum="@Model.Filtre.Kurum"
+                                   asp-route-Filtre.PageSize="@Model.Filtre.PageSize"
+                                   asp-route-Filtre.SortBy="@Model.Filtre.SortBy"
+                                   class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-petrol-800 rounded-lg transition-colors"
+                                   aria-label="Önceki Sayfa">
+                                    <i class="fas fa-chevron-left mr-1"></i> Önceki
+                                </a>
+                            }
 
-                        @if (Model.Filtre.Page < Model.GetTotalPages())
-                        {
-                            <a asp-page="./Index"
-                               asp-route-page="@(Model.Filtre.Page + 1)"
-                               asp-route-arama="@Model.Filtre.Arama"
-                               asp-route-turu="@Model.Filtre.Turu"
-                               asp-route-kurum="@Model.Filtre.Kurum"
-                               class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-petrol-800 rounded-lg transition-colors"
-                               aria-label="Sonraki Sayfa">
-                                Sonraki <i class="fas fa-chevron-right ml-1"></i>
-                            </a>
-                        }
+                            @* Sayfa Numaraları *@
+                            @for (int i = Math.Max(1, Model.Filtre.Page - 2); i <= Math.Min(Model.GetTotalPages(), Model.Filtre.Page + 2); i++)
+                            {
+                                <a asp-page="./Index"
+                                   asp-route-Filtre.Page="@i"
+                                   asp-route-Filtre.Arama="@Model.Filtre.Arama"
+                                   asp-route-Filtre.Turu="@Model.Filtre.Turu"
+                                   asp-route-Filtre.Kurum="@Model.Filtre.Kurum"
+                                   asp-route-Filtre.PageSize="@Model.Filtre.PageSize"
+                                   asp-route-Filtre.SortBy="@Model.Filtre.SortBy"
+                                   class="w-10 h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-colors @(i == Model.Filtre.Page ? "bg-accent-500 text-white" : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-petrol-800")"
+                                   aria-label="Sayfa @i">
+                                    @i
+                                </a>
+                            }
+
+                            @if (Model.Filtre.Page < Model.GetTotalPages())
+                            {
+                                <a asp-page="./Index"
+                                   asp-route-Filtre.Page="@(Model.Filtre.Page + 1)"
+                                   asp-route-Filtre.Arama="@Model.Filtre.Arama"
+                                   asp-route-Filtre.Turu="@Model.Filtre.Turu"
+                                   asp-route-Filtre.Kurum="@Model.Filtre.Kurum"
+                                   asp-route-Filtre.PageSize="@Model.Filtre.PageSize"
+                                   asp-route-Filtre.SortBy="@Model.Filtre.SortBy"
+                                   class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-petrol-800 rounded-lg transition-colors"
+                                   aria-label="Sonraki Sayfa">
+                                    Sonraki <i class="fas fa-chevron-right ml-1"></i>
+                                </a>
+                            }
+                        </div>
                     </nav>
                 </div>
             }
         }
         else
         {
-            @* ═══════════════════════════════════════════════════════════════════
-               EMPTY STATE (Boş Durum)
-               ═══════════════════════════════════════════════════════════════ *@
+            @* ─────────────────────────────────────────────────────────────────
+               EMPTY STATE
+               ───────────────────────────────────────────────────────────────── *@
             <div class="flex flex-col items-center justify-center py-20 px-4 text-center glass-card rounded-3xl border border-dashed border-gray-300 dark:border-petrol-700 animate__animated animate__fadeIn">
                 <div class="w-24 h-24 bg-gray-50 dark:bg-petrol-800 rounded-full flex items-center justify-center mb-6 shadow-inner ring-8 ring-gray-50/50 dark:ring-petrol-800/50">
                     <i class="fas fa-search text-4xl text-gray-300 dark:text-petrol-600"></i>
@@ -334,6 +349,9 @@
     @Html.AntiForgeryToken()
 </form>
 
+@* ════════════════════════════════════════════════════════════════════════════
+   JAVASCRIPT
+   ════════════════════════════════════════════════════════════════════════════ *@
 @section Scripts {
     <script type="module">
         // ═══════════════════════════════════════════════════════════════════
@@ -345,6 +363,8 @@
         /**
          * Silme işlemi için merkezi fonksiyon
          * AlertService.confirmDelete kullanır (inline Swal YOK!)
+         * @@param {number} id - Silinecek çağrı ID
+         * @@param {string} baslik - Çağrı başlığı (Onay mesajında gösterilir)
          */
         window.handleDelete = async function(id, baslik) {
             // [Mimari Notu]
@@ -357,23 +377,27 @@
             );
 
             if (confirmed) {
-                // Yükleme göstergesi
+                // [Kullanıcı Deneyimi]
+                // Yükleme göstergesi ile kullanıcıya işlem devam ediyor mesajı verilir
                 AlertService.showLoading('Çağrı siliniyor...');
 
-                // Form submit
+                // [Form Submit]
+                // CSRF token ile korumalı form gönderimi
                 document.getElementById('deleteId').value = id;
                 document.getElementById('deleteForm').submit();
             }
         }
 
         // ═══════════════════════════════════════════════════════════════════
-        // AUTO-SUBMIT FİLTRELERİ (Debounce ile)
+        // AUTO-SUBMIT FİLTRELERİ (Debounce ile Optimize Edilmiş)
         // ═══════════════════════════════════════════════════════════════════
 
         const filterForm = document.getElementById('filterForm');
         let debounceTimer = null;
 
+        // [Performans]
         // Text input'lar için debounce (600ms)
+        // Kullanıcı yazmayı bıraktığında otomatik arama yapılır
         const textInputs = filterForm.querySelectorAll('#filter_search, #filter_org');
         textInputs.forEach(input => {
             input.addEventListener('input', function() {
@@ -384,7 +408,8 @@
             });
         });
 
-        // Dropdown için hemen submit
+        // [Kullanıcı Deneyimi]
+        // Dropdown için hemen submit (Debounce gerekmez)
         const typeFilter = document.getElementById('filter_type');
         if (typeFilter) {
             typeFilter.addEventListener('change', function() {
@@ -403,33 +428,43 @@
    Modern, responsive, glassmorphism tasarımlı liste görünümü.
    
    [ÖZELLİKLER]
-   - Responsive Card Grid Layout
+   - Responsive Card Grid Layout (3 sütun desktop, 2 sütun tablet, 1 sütun mobil)
    - Gelişmiş Filtreleme (Arama, Tür, Kurum)
-   - Pagination (Query String Korumalı)
-   - Lazy Loading Images
+   - Pagination (Query String Korumalı - Filtreler URL'de saklanır)
+   - Lazy Loading Images (loading="lazy")
    - AlertService Entegrasyonu (Merkezi Feedback)
    - Accessibility Compliant (ARIA labels, keyboard navigation)
-   - Dark Mode Support
+   - Dark Mode Support (localStorage ile kalıcı)
    
    [MİMARİ]
    - ❌ ASLA inline Swal.fire() kullanma
-   - ✅ HER ZAMAN AlertService.confirmDelete() kullan
+   - ✅ HER ZAMAN AlertService modülü kullan
+   - ES Module import yapısı (import/export)
    - Region kullanımı ile kod organizasyonu
-   - TempData ile server-side mesajlar (_LayoutDashboard'da otomatik)
+   - TempData ile server-side mesajlar (_LayoutDashboard'da otomatik gösterilir)
    
    [PERFORMANS]
    - Lazy loading images (loading="lazy")
-   - Debounced auto-submit (600ms)
-   - CSS ile animasyonlar (GPU accelerated)
+   - Debounced auto-submit (600ms) - Gereksiz server çağrılarını önler
+   - CSS transitions (GPU accelerated)
+   - Pagination ile sayfa başına 12 kayıt
    
    [GÜVENLİK]
-   - CSRF token koruması
-   - XSS koruması (Html.Raw escape)
-   - SQL Injection koruması (EF Core)
+   - CSRF token koruması (@Html.AntiForgeryToken())
+   - XSS koruması (Razor automatic encoding)
+   - SQL Injection koruması (EF Core parameterized queries)
+   - Input validation (Model binding)
+   
+   [ÇAĞRI TÜRÜ DROPDOWN ÇÖZÜMÜ]
+   - asp-for="Filtre.Turu" ile model binding sağlandı
+   - Seçili değer artık doğru görünüyor
+   - URL'de enum ismi yerine değeri görünmesi normal (asp-route ile kontrol edilir)
+   - Dark mode'da dropdown rengi uyumlu
    
    [BAĞIMLILIKLAR]
    - /js/modules/alertService.js (Merkezi feedback sistemi)
    - _LayoutDashboard.cshtml (Layout)
-   - Tailwind CSS
-   - Font Awesome 6.4
+   - Tailwind CSS (Utility-first CSS framework)
+   - Font Awesome 6.4 (İkon kütüphanesi)
+   - SweetAlert2 (AlertService tarafından kullanılır)
 *@

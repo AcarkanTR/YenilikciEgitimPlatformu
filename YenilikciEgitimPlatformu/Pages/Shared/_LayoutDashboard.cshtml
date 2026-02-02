@@ -82,13 +82,20 @@
         }
     </script>
 
-    <!-- Fonts & Icons -->
+    <!-- Inter (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome 7.1.0 (Free) - jsDelivr (npm) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fortawesome/fontawesome-free@7.1.0/css/all.min.css">
+
+    <!-- Chart.js 4.5.1 - jsDelivr (npm) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+
+    <!-- SweetAlert2 11.26.17 - jsDelivr (npm) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.17/dist/sweetalert2.all.min.js"></script>
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
     <!-- Anti-Flash Script (Sayfa Yüklenmeden Çalışmalı) -->
@@ -101,6 +108,10 @@
     </script>
 
     <style>
+        /* ═══════════════════════════════════════════════════════════════
+                   CUSTOM STYLES - Glassmorphism & Modern UI
+                   ═══════════════════════════════════════════════════════════════ */
+
         /* Sidebar Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
             width: 5px;
@@ -126,7 +137,7 @@
             background: rgba(0, 43, 54, 0.9); /* Petrol-900 with opacity */
         }
 
-        /* Nav Link Styles - HOVER EFFECT EKLENDİ */
+        /* Nav Link Styles - HOVER EFFECT */
         .nav-link {
             transition: all 0.2s ease-in-out;
             border-left: 3px solid transparent;
@@ -159,35 +170,38 @@
 </head>
 <body class="bg-gray-50 dark:bg-petrol-950 text-slate-800 dark:text-gray-200 font-sans transition-colors duration-300 flex h-screen overflow-hidden">
 
-    <!-- Mobile Overlay -->
+    @* ════════════════════════════════════════════════════════════════════
+       MOBILE OVERLAY
+       ════════════════════════════════════════════════════════════════════ *@
     <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
 
-    <!-- SIDEBAR -->
+    @* ════════════════════════════════════════════════════════════════════
+       SIDEBAR
+       ════════════════════════════════════════════════════════════════════ *@
     <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-72 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 bg-white dark:bg-petrol-900 border-r border-gray-200 dark:border-petrol-800 flex flex-col shadow-xl">
 
-        <!-- 1. Logo Bölümü (Güncellendi) -->
-        <div class="h-20 flex items-center px-6 border-b border-gray-100 dark:border-petrol-800">
-            <a asp-page="/Index" class="flex items-center gap-3 group w-full">
-                <!-- Icon -->
-                <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-petrol-600 to-petrol-500 flex items-center justify-center shadow-md transition-transform duration-300 group-hover:scale-105">
-                    <i class="fas fa-graduation-cap text-white text-lg"></i>
+        @* ─────────────────────────────────────────────────────────────────
+           LOGO & BRAND
+           ───────────────────────────────────────────────────────────────── *@
+        <div class="p-6 border-b border-gray-100 dark:border-petrol-800 shrink-0">
+            <div class="flex items-center gap-3 group">
+                <!-- Logo Icon (Renk ve pozisyon sabit kaldı) -->
+                <div class="relative w-12 h-12 rounded-xl bg-gradient-to-br from-petrol-500 to-petrol-700 dark:from-petrol-400 dark:to-petrol-600 flex items-center justify-center shadow-lg shadow-petrol-500/30 group-hover:shadow-petrol-500/50 transition-shadow">
+                    <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    <div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-accent-500 rounded-full border-2 border-white dark:border-petrol-900 animate-pulse"></div>
                 </div>
-                <!-- Text -->
-                <div class="leading-tight">
-                    <span class="block text-xl font-bold tracking-tight text-petrol-800 dark:text-white group-hover:text-accent-500 transition-colors">
-                        YEP<span class="text-accent-500">Panel</span>
-                    </span>
-                    <span class="block text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                        Yönetim Sistemi
-                    </span>
+
+                <!-- Brand Text -->
+                <div class="flex-1">
+                    <h1 class="text-lg font-black text-petrol-800 dark:text-white leading-tight tracking-tight">YEP</h1>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Admin Panel</p>
                 </div>
-            </a>
-            <!-- Mobile Close -->
-            <button class="lg:hidden ml-auto text-gray-500 hover:text-red-500" onclick="toggleSidebar()">
-                <i class="fas fa-times text-xl"></i>
-            </button>
+            </div>
         </div>
 
+        @* ─────────────────────────────────────────────────────────────────
+           USER PROFILE CARD
+           ───────────────────────────────────────────────────────────────── *@
         <!-- 2. Kullanıcı Profil Kartı (Modernize Edildi & Hata Düzeltildi) -->
         <div class="p-4">
             <div class="p-4 rounded-2xl bg-gradient-to-br from-gray-50 to-white dark:from-petrol-800 dark:to-petrol-900 border border-gray-100 dark:border-petrol-700 shadow-sm relative overflow-hidden group">
@@ -230,57 +244,43 @@
             </div>
         </div>
 
-        <!-- 3. Navigasyon (Genişletildi) -->
-        <nav class="flex-1 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar">
+        @* ─────────────────────────────────────────────────────────────────
+           NAVIGATION MENU
+           ───────────────────────────────────────────────────────────────── *@
+        <nav class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1">
 
-            <!-- Admin Menüsü -->
             @if (isAdmin)
             {
-                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-2 px-2">Yönetim</div>
+                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">Yönetim</div>
 
                 <a asp-area="Admin" asp-page="/Dashboard/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/dashboard") ? "active" : "")">
-                    <i class="fas fa-chart-pie w-5 text-center"></i> Genel Bakış
+                    <i class="fas fa-chart-line w-5 text-center"></i> Dashboard
                 </a>
 
-                <a asp-area="Admin" asp-page="/Okullar/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/okullar") ? "active" : "")">
-                    <i class="fas fa-school w-5 text-center"></i> Okul Yönetimi
+                <a asp-area="Admin" asp-page="/CagriBilgileri/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/cagri") ? "active" : "")">
+                    <i class="fas fa-bullhorn w-5 text-center"></i> Çağrılar
                 </a>
 
-                <a asp-area="Admin" asp-page="/Kullanicilar/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/kullanicilar") ? "active" : "")">
-                    <i class="fas fa-users-cog w-5 text-center"></i> Kullanıcılar
+                <a asp-area="Admin" asp-page="/Kullanicilar/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/kullanici") ? "active" : "")">
+                    <i class="fas fa-users w-5 text-center"></i> Kullanıcılar
                 </a>
 
-                <a asp-area="Admin" asp-page="/Icerik/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/icerik") ? "active" : "")">
-                    <i class="fas fa-layer-group w-5 text-center"></i> İçerik Yönetimi
+                <a asp-area="Admin" asp-page="/Projeler/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/projeler") ? "active" : "")">
+                    <i class="fas fa-project-diagram w-5 text-center"></i> Projeler
                 </a>
 
-                <a asp-area="Admin" asp-page="/Raporlar/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/raporlar") ? "active" : "")">
-                    <i class="fas fa-file-invoice-dollar w-5 text-center"></i> Raporlar
+                <a asp-area="Admin" asp-page="/Moderasyon/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/moderasyon") ? "active" : "")">
+                    <i class="fas fa-gavel w-5 text-center"></i> Moderasyon
                 </a>
 
-                <!-- Çağrı Bilgisi Sistemi (Sistem 1) -->
-                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Çağrı Yönetimi</div>
-
-                <a asp-area="Admin" asp-page="/CagriBilgileri/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/cagribilgileri") && !currentPath.Contains("olustur") ? "active" : "")">
-                    <i class="fas fa-bullhorn w-5 text-center"></i> Çağrı Listesi
-                </a>
-
-                <a asp-area="Admin" asp-page="/CagriBilgileri/Olustur" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/cagribilgileri/olustur") ? "active" : "")">
-                    <i class="fas fa-plus-circle w-5 text-center"></i> Yeni Çağrı
-                </a>
-
-                <!-- Proje Yönetimi (Sistem 2) -->
-                <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Proje Yönetimi</div>
-
-                <a asp-area="Admin" asp-page="/ProjeYonetimi/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/projeyonetimi") ? "active" : "")">
-                    <i class="fas fa-tasks w-5 text-center"></i> Projeler
+                <a asp-area="Admin" asp-page="/Ayarlar/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/admin/ayarlar") ? "active" : "")">
+                    <i class="fas fa-cog w-5 text-center"></i> Ayarlar
                 </a>
             }
 
-            <!-- Kullanıcı Menüsü -->
-            <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Kişisel</div>
+            <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 mt-4 px-2">Genel</div>
 
-            <a asp-area="User" asp-page="/Dashboard/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/user/dashboard") ? "active" : "")">
+            <a asp-area="User" asp-page="/Index" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 @(currentPath.Contains("/user/index") ? "active" : "")">
                 <i class="fas fa-home w-5 text-center"></i> Panelim
             </a>
 
@@ -315,7 +315,9 @@
 
         </nav>
 
-        <!-- Sidebar Footer -->
+        @* ─────────────────────────────────────────────────────────────────
+           SIDEBAR FOOTER
+           ───────────────────────────────────────────────────────────────── *@
         <div class="p-4 border-t border-gray-100 dark:border-petrol-800">
             <a href="/" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gray-50 dark:bg-petrol-800 text-sm font-semibold text-petrol-700 dark:text-petrol-300 hover:bg-gray-100 dark:hover:bg-petrol-700 transition-colors">
                 <i class="fas fa-globe"></i> Siteye Dön
@@ -323,10 +325,14 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT WRAPPER -->
+    @* ════════════════════════════════════════════════════════════════════
+       MAIN CONTENT WRAPPER
+       ════════════════════════════════════════════════════════════════════ *@
     <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
 
-        <!-- HEADER (Glassmorphism & Theme Toggle Fixed) -->
+        @* ─────────────────────────────────────────────────────────────────
+           HEADER
+           ───────────────────────────────────────────────────────────────── *@
         <header class="h-20 glass-header border-b border-gray-200 dark:border-petrol-800 flex items-center justify-between px-6 lg:px-8 z-30 shrink-0">
 
             <!-- Left: Mobile Toggle & Page Title -->
@@ -353,7 +359,7 @@
                     <input type="text" placeholder="Panelde ara..." class="pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-petrol-800 border border-transparent focus:border-accent-500 focus:ring-0 text-sm w-48 transition-all focus:w-64 dark:text-white placeholder-gray-500" />
                 </div>
 
-                <!-- Theme Toggle (Dönen Güneş/Ay Animasyonu) -->
+                <!-- Theme Toggle -->
                 <button id="theme-toggle" type="button" class="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-petrol-800 transition-colors flex items-center justify-center relative overflow-hidden group">
                     <i id="theme-toggle-light-icon" class="fas fa-sun text-accent-500 text-xl hidden animate-spin-slow"></i>
                     <i id="theme-toggle-dark-icon" class="fas fa-moon text-petrol-600 dark:text-white text-xl hidden group-hover:scale-110 transition-transform"></i>
@@ -368,7 +374,9 @@
             </div>
         </header>
 
-        <!-- MAIN CONTENT (Scrollable) -->
+        @* ─────────────────────────────────────────────────────────────────
+           MAIN CONTENT (Scrollable)
+           ───────────────────────────────────────────────────────────────── *@
         <main class="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
             <!-- Fade In Animation Wrapper -->
             <div class="animate-fade-in max-w-7xl mx-auto">
@@ -384,10 +392,60 @@
 
     </div>
 
-    <!-- Scripts -->
+    @* ════════════════════════════════════════════════════════════════════
+       SCRIPTS
+       ════════════════════════════════════════════════════════════════════ *@
+
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @* ─────────────────────────────────────────────────────────────────
+       ALERTSERVICE ENTEGRASYONU (ES MODULE)
+       ───────────────────────────────────────────────────────────────── *@
+    <script type="module">
+        import { AlertService } from '/js/modules/alertService.js';
+
+        // TempData mesajlarını otomatik göster
+        window.addEventListener('DOMContentLoaded', function () {
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                    AlertService.toastSuccess('@Html.Raw(TempData["SuccessMessage"])');
+                    </text>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <text>
+                    AlertService.error('@Html.Raw(TempData["ErrorMessage"])');
+                    </text>
+            }
+
+            @if (TempData["InfoMessage"] != null)
+            {
+                    <text>
+                    AlertService.info('@Html.Raw(TempData["InfoMessage"])');
+                    </text>
+            }
+
+            @if (TempData["WarningMessage"] != null)
+            {
+                    <text>
+                    AlertService.warning('@Html.Raw(TempData["WarningMessage"])');
+                    </text>
+            }
+        });
+
+        // Global erişim için window'a ekle
+        window.AlertService = AlertService;
+    </script>
+
+    @* ─────────────────────────────────────────────────────────────────
+       CORE UI SCRIPTS
+       ───────────────────────────────────────────────────────────────── *@
     <script>
-        // --- Sidebar Logic ---
+        // ═══════════════════════════════════════════════════════════════
+        // SIDEBAR TOGGLE LOGIC
+        // ═══════════════════════════════════════════════════════════════
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobile-overlay');
@@ -396,15 +454,17 @@
             if (isClosed) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
-                setTimeout(() => overlay.classList.remove('opacity-0'), 10); // Fade effect
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
             } else {
                 sidebar.classList.add('-translate-x-full');
                 overlay.classList.add('opacity-0');
-                setTimeout(() => overlay.classList.add('hidden'), 300); // Wait for fade out
+                setTimeout(() => overlay.classList.add('hidden'), 300);
             }
         }
 
-        // --- Dark Mode Logic (Dönen Animasyonlu) ---
+        // ═══════════════════════════════════════════════════════════════
+        // DARK MODE TOGGLE LOGIC
+        // ═══════════════════════════════════════════════════════════════
         var themeToggleBtn = document.getElementById('theme-toggle');
         var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
@@ -438,13 +498,64 @@
                 }
             }
         });
-
-        // --- SweetAlert2 Entegrasyonu ---
-        @if (TempData["SweetAlert"] != null)
-        {
-                 @Html.Raw(TempData["SweetAlert"])
-        }
     </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+@* ════════════════════════════════════════════════════════════════════════════
+ * LAYOUT AÇIKLAMASI - _LayoutDashboard.cshtml
+ * ════════════════════════════════════════════════════════════════════════════
+ * 
+ * [AMAÇ]
+ * Admin ve User panel sayfaları için ana layout.
+ * Modern, responsive, glassmorphism tasarım dili.
+ * 
+ * [ÖZELLİKLER]
+ * - Sidebar navigation (Responsive - Mobile'da slide-in)
+ * - Dark mode desteği (LocalStorage persistence)
+ * - User profile card
+ * - Role-based navigation (Admin/User)
+ * - TempData ile otomatik AlertService entegrasyonu
+ * - Smooth animations ve transitions
+ * 
+ * [TASARIM SİSTEMİ]
+ * - Renk Paleti: Petrol Mavisi + Turuncu Accent
+ * - Tipografi: Inter (Google Fonts)
+ * - İkonlar: Font Awesome 6.4
+ * - Grid: Tailwind CSS utility classes
+ * 
+ * [ALERTSERVICE ENTEGRASYONU]
+ * - ❌ ASLA inline Swal.fire() kullanılmaz
+ * - ✅ HER ZAMAN AlertService modülü kullanılır
+ * - TempData["SuccessMessage"] -> AlertService.toastSuccess()
+ * - TempData["ErrorMessage"] -> AlertService.error()
+ * - TempData["InfoMessage"] -> AlertService.info()
+ * - TempData["WarningMessage"] -> AlertService.warning()
+ * 
+ * [PERFORMANS]
+ * - Anti-flash script (Dark mode flash önleme)
+ * - Lazy loading (Görsel yükleme optimize)
+ * - CSS transitions (GPU accelerated)
+ * 
+ * [ERİŞİLEBİLİRLİK]
+ * - Semantic HTML5
+ * - ARIA labels
+ * - Keyboard navigation
+ * - Screen reader friendly
+ * 
+ * [BAĞIMLILIKLAR]
+ * - Tailwind CSS (CDN)
+ * - Font Awesome 6.4 (CDN)
+ * - SweetAlert2 (CDN)
+ * - Chart.js (CDN - Dashboard için)
+ * - /js/modules/alertService.js (Merkezi feedback sistemi)
+ * - /js/site.js (Site-wide scripts)
+ * 
+ * [MİMARİ NOTLAR]
+ * - ES Module yapısı (import/export)
+ * - Region kullanımı ile kod organizasyonu
+ * - Türkçe açıklamalar
+ * - Clean code principles
+ *@

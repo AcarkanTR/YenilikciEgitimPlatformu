@@ -8,10 +8,11 @@ using YenilikciEgitimPlatformu.ViewModels.CagriBilgisi;
 namespace YenilikciEgitimPlatformu.Areas.Admin.Pages.CagriBilgileri;
 
 /// <summary>
-/// Admin Çağrı Bilgileri liste sayfası
+/// Admin Çağrı Bilgileri liste sayfası PageModel
 /// CRUD işlemleri için ana yönetim sayfası
 /// </summary>
 [Authorize(Roles = "Admin")]
+
 public class IndexModel : PageModel
 {
     #region Fields & Constructor
@@ -26,6 +27,7 @@ public class IndexModel : PageModel
         _cagriService = cagriService;
         _logger = logger;
 
+        // [Konfigürasyon]
         // Türkçe tarih formatı için global ayar
         CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("tr-TR");
         CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("tr-TR");
@@ -54,12 +56,14 @@ public class IndexModel : PageModel
 
     /// <summary>
     /// Başarı mesajı (silme işlemi sonrası)
+    /// TempData ile Layout'ta AlertService.toastSuccess() tetiklenir
     /// </summary>
     [TempData]
     public string? SuccessMessage { get; set; }
 
     /// <summary>
     /// Hata mesajı
+    /// TempData ile Layout'ta AlertService.error() tetiklenir
     /// </summary>
     [TempData]
     public string? ErrorMessage { get; set; }
@@ -70,21 +74,34 @@ public class IndexModel : PageModel
 
     /// <summary>
     /// Sayfa yükleme - Filtreleme ve listeleme
+    /// GET: /Admin/CagriBilgileri
     /// </summary>
     public async Task OnGetAsync()
     {
         try
         {
+            // [Mimari Notu]
+            // Bu metot eventual consistency kabul eder.
+            // Listeleme read-only işlemdir ve cache'lenebilir.
+            // Kısa süreli cache tutarsızlıkları kabul edilir.
+
             // [Konfigürasyon]
             // Admin için pasif çağrılar da gösterilir
             Filtre.SadeceAktif = false;
 
             // [Servis Çağrısı]
             // Filtreleme, sayfalama ve sıralama serviste uygulanır
+            // AsNoTracking() ve Projection ile optimize edilmiştir
             var result = await _cagriService.GetAllAsync(Filtre);
 
             Data = result.Data;
             TotalCount = result.TotalCount;
+
+            // [Performans Logging]
+            _logger.LogInformation(
+                "Çağrı listesi yüklendi. Toplam: {TotalCount}, Sayfa: {Page}, PageSize: {PageSize}",
+                TotalCount, Filtre.Page, Filtre.PageSize
+            );
         }
         catch (Exception ex)
         {
@@ -92,13 +109,20 @@ public class IndexModel : PageModel
             // Listeleme hatası kritik değildir, boş liste gösterilir
             _logger.LogError(ex, "Çağrı listesi yüklenirken hata");
             ErrorMessage = "Çağrı listesi yüklenirken bir hata oluştu. Lütfen tekrar deneyin.";
+
+            // [Graceful Degradation]
+            // Boş liste ile devam et
+            Data = new List<CagriListViewModel>();
+            TotalCount = 0;
         }
     }
 
     /// <summary>
     /// Silme işlemi (Soft Delete)
+    /// POST: /Admin/CagriBilgileri?handler=Delete&id=123
     /// </summary>
     /// <param name="id">Silinecek çağrı ID</param>
+    /// <returns>Redirect to Index</returns>
     public async Task<IActionResult> OnPostDeleteAsync(int id)
     {
         try
@@ -107,9 +131,21 @@ public class IndexModel : PageModel
             // Bu metot eventual consistency kabul eder.
             // DB atomic, cache ve SignalR side-effect olarak ele alınır.
 
+            // [Güvenlik]
+            // Admin rolü zaten [Authorize] ile kontrol ediliyor
+            // Ek yetki kontrolü gerekmez
+
             // [Audit Trail]
             // Kullanıcı bilgisi audit için servise gönderilir
             var userId = User.Identity?.Name ?? "system";
+
+            // [Validasyon]
+            if (id <= 0)
+            {
+                ErrorMessage = "Geçersiz çağrı ID.";
+                _logger.LogWarning("Geçersiz çağrı ID ile silme denemesi: {Id}", id);
+                return RedirectToPage();
+            }
 
             // [Silme İşlemi]
             // Soft Delete: SilindiMi = true, SilinmeTarihi = DateTime.UtcNow
@@ -149,6 +185,7 @@ public class IndexModel : PageModel
     /// <summary>
     /// Sayfa sayısını hesaplar (Pagination için)
     /// </summary>
+    /// <returns>Toplam sayfa sayısı</returns>
     public int GetTotalPages()
     {
         return (int)Math.Ceiling((double)TotalCount / Filtre.PageSize);
@@ -157,6 +194,7 @@ public class IndexModel : PageModel
     /// <summary>
     /// Mevcut sayfanın son kayıt numarasını döner
     /// </summary>
+    /// <returns>Son kayıt numarası</returns>
     public int GetEndRecord()
     {
         var end = Filtre.Page * Filtre.PageSize;
@@ -166,6 +204,7 @@ public class IndexModel : PageModel
     /// <summary>
     /// Mevcut sayfanın ilk kayıt numarasını döner
     /// </summary>
+    /// <returns>İlk kayıt numarası</returns>
     public int GetStartRecord()
     {
         return TotalCount == 0 ? 0 : ((Filtre.Page - 1) * Filtre.PageSize) + 1;
@@ -176,7 +215,7 @@ public class IndexModel : PageModel
 
 /*
  * ════════════════════════════════════════════════════════════════════════════
- * SAYFA AÇIKLAMASI
+ * SAYFA AÇIKLAMASI - CagriBilgileri Index.cshtml.cs
  * ════════════════════════════════════════════════════════════════════════════
  * 
  * [AMAÇ]
@@ -213,12 +252,14 @@ public class IndexModel : PageModel
  * - Projection ile sadece gerekli alanlar
  * - Sayfalama ile veri sınırlaması
  * - Cache kullanımı (5 dakika TTL)
+ * - Lazy loading görseller için
  * 
  * [GÜVENLİK]
  * - CSRF token koruması
  * - XSS koruması (Razor encoding)
  * - SQL Injection koruması (EF Core)
  * - Audit logging (Kim, Ne Zaman, Ne Yaptı)
+ * - Input validation (Model binding)
  * 
  * [VERİ AKIŞI]
  * 1. OnGetAsync() -> Filtre uygula -> Servisten veri çek -> View'e aktar
@@ -229,17 +270,39 @@ public class IndexModel : PageModel
  * - DB işlemi atomic (EF Core)
  * - Cache ve SignalR side-effect
  * - Kısa süreli tutarsızlık kabul edilir
+ * - Cache invalidation gerçek zamanlı değildir
  * 
  * [ALERTSERVICE ENTEGRASYONU]
  * - ❌ ASLA alert(), confirm() kullanılmaz
  * - ✅ HER ZAMAN AlertService.confirmDelete() kullanılır
- * - TempData ile server-side mesajlar otomatik gösterilir
- * - Toast: Başarılı işlemler (3 saniye)
- * - Modal: Hatalar (Manuel kapatma)
+ * - TempData ile server-side mesajlar otomatik gösterilir:
+ *   * TempData["SuccessMessage"] -> AlertService.toastSuccess() (3 saniye)
+ *   * TempData["ErrorMessage"] -> AlertService.error() (Modal)
+ * - Frontend'de JavaScript ile AlertService import edilir (ES Module)
+ * 
+ * [FİLTRELEME VE SAYFALAMA]
+ * - Query string ile filtre değerleri korunur
+ * - [BindProperty(SupportsGet = true)] ile otomatik model binding
+ * - Filtre değişikliğinde sayfa 1'e döner
+ * - Pagination linkleri filtre parametrelerini korur
+ * - Debounced auto-submit (600ms) ile kullanıcı deneyimi optimize edilir
  * 
  * [BAĞIMLILIKLAR]
  * - ICagriBilgisiService (İş mantığı)
  * - CagriFiltreleViewModel (Filtre modeli)
  * - CagriListViewModel (Liste görünümü)
  * - AlertService.js (Kullanıcı geri bildirimi)
+ * - _LayoutDashboard.cshtml (Layout)
+ * 
+ * [LOGGING]
+ * - ILogger ile tüm işlemler loglanır
+ * - Serilog ile structured logging
+ * - Error, Warning, Information seviyeleri
+ * - Exception stack trace ile detaylı hata kayıtları
+ * 
+ * [REGION YAPISI]
+ * - Fields & Constructor: Dependency injection ve field tanımları
+ * - Properties: Public ve bindable özellikler
+ * - HTTP Handlers: OnGetAsync, OnPostDeleteAsync vb.
+ * - Helper Methods: Hesaplama ve yardımcı fonksiyonlar
  */
